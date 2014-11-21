@@ -8,8 +8,7 @@
 
 SheepIt Render Farm Client is an *Open Source* client for the distributed render farm "Sheep It".
 
-
-
+This fork is aimed at improving standalone client interface (cli).
 
 ## Compilation
 

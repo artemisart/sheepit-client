@@ -96,6 +96,10 @@ public class Worker {
 			parser.parseArgument(args);
 		}
 		catch (CmdLineException e) {
+			if (display_version) {
+				System.out.println("Version: " + new Configuration(null, "", "").getJarVersion());
+				return;
+			}
 			System.err.println(e.getMessage());
 			System.err.println("Usage: ");
 			parser.printUsage(System.err);
@@ -105,8 +109,7 @@ public class Worker {
 		}
 		
 		if (display_version) {
-			Configuration config = new Configuration(null, "", "");
-			System.out.println("Version: " + config.getJarVersion());
+			System.out.println("Version: " + new Configuration(null, "", "").getJarVersion());
 			return;
 		}
 		

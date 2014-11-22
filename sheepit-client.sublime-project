@@ -1,0 +1,13 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		},
+		{
+			"name": "src/com/sheepit/client",
+			"path": "src/com/sheepit/client"
+		}
+	]
+}

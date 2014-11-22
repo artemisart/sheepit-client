@@ -7,7 +7,7 @@ Parameters as GET:
     * version: Client's version, for example 3.3.1762.
     * os: Computer's operating system, at the moment only "windows", "mac" and "linux" are supported.
     * bits: Architecture size, at the moment only "32bit" and "64bit" are supported.
-    * cpu_family: CPU's family, on linux it can be get in /proc/cpuinfo via the attribute "cpu fanily".
+    * cpu_family: CPU's family, on linux it can be get in /proc/cpuinfo via the attribute "cpu family".
     * cpu_model: CPU's model, on linux it can be get in /proc/cpuinfo via the attribute "model".
     * cpu_model_name: CPU's model as human readable, on linux it can be get in /proc/cpuinfo via the attribute "model name".
     * cpu_cores: Number of core (or thread) available.
@@ -20,8 +20,8 @@ Answer in case of error:
 where X:
     * 100 => Error no version given.
     * 101 => Client is too old.
-    * 102 => Authentification failure.
-    * 103 => WebSession have expirated.
+    * 102 => Authentication failure.
+    * 103 => WebSession have expired.
     * 104 => Missing parameter.
     * something else => Unknown error.
 
@@ -74,7 +74,7 @@ On error: an 404 http code
 
 Url: use the request type "request-job" from the configuration answer.
 Parameter as GET or POST:
-    * computemethod: What are my computer capability, 0 for using gpu and cpu (the computer is capable of using both but it will not use it at the same time), 1 for cpu only, 2 for gpu only. 
+    * computemethod: What are my computer capability, 0 for using gpu and cpu (the computer is capable of using both but it will not use it at the same time), 1 for cpu only, 2 for gpu only.
 
 Answer in case of error:
 <?xml version="1.0" encoding="utf-8" ?>
@@ -86,7 +86,7 @@ where X:
     * 202 => Client's session is dead. Client should do a config request before requesting a new job.
     * 203 => Client's session have been disabled (usually because the client is sending broken frame). The client warms the end user and logout.
     * something else => unknown error
-    
+
 Answer with no error:
 <?xml version="1.0" encoding="utf-8" ?>
 <jobrequest status="0">
@@ -123,7 +123,7 @@ Parameter as GET or POST:
     * memoryused (optional): Max memory used for the render
     * cores (optional): Number of cores used from the render
 Parameter as form-urlencoded:
-    * file: the frame to send   
+    * file: the frame to send
 
 Answer in case of error:
 <jobvalidate status="X" />
@@ -161,7 +161,7 @@ Parameter as GET or POST:
     * rendertime (optional): job's frame number
     * memoryused (optional): max memory used for the render
 Parameter as form-urlencoded:
-    * file: the error log to send   
+    * file: the error log to send
 
 
 Answer:

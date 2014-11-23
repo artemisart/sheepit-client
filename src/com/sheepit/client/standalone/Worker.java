@@ -2,7 +2,7 @@
  * Copyright (C) 2010-2014 Laurent CLOUET
  * Author Laurent CLOUET <laurent.clouet@nopnop.net>
  *
- * This program is free software; you can redistribute it and/or 
+ * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; version 2
  * of the License.
@@ -28,10 +28,13 @@ import java.io.File;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.LinkedList;
+import java.util.*;
 import com.sheepit.client.Client;
 import com.sheepit.client.Configuration;
 import com.sheepit.client.Configuration.ComputeType;
@@ -44,62 +47,77 @@ import com.sheepit.client.hardware.gpu.GPUDevice;
 import com.sheepit.client.network.ProxyAuthenticator;
 
 public class Worker {
-	@Option(name = "-server", usage = "Render-farm server, default https://www.sheepit-renderfarm.com", metaVar = "URL", required = false)
+	@Option(name = "--server", aliases = {"-s"}, usage = "Render-farm server, default https://www.sheepit-renderfarm.com", metaVar = "URL")
 	private String server = "https://www.sheepit-renderfarm.com";
-	
-	@Option(name = "-login", usage = "User's login", metaVar = "LOGIN", required = true)
+
+	@Option(name = "--login", aliases = {"-l"}, usage = "User's login", metaVar = "USERNAME")
 	private String login = "";
-	
-	@Option(name = "-password", usage = "User's password", metaVar = "PASSWORD", required = true)
+
+	@Option(name = "--password", aliases = {"-p"}, usage = "User's password", metaVar = "PASSWORD")
 	private String password = "";
-	
-	@Option(name = "-cache-dir", usage = "Cache/Working directory. Caution, everything in it not related to the render-farm will be removed", metaVar = "/tmp/cache", required = false)
+
+	@Option(name = "--cache-dir", aliases = {"-cd"}, usage = "Cache/Working directory. Caution, everything in it not related to the render-farm will be removed", metaVar = "/tmp/cache")
 	private String cache_dir = null;
-	
-	@Option(name = "-max-uploading-job", usage = "", metaVar = "1", required = false)
+
+	@Option(name = "-max-uploading-job", usage = "", metaVar = "1")
 	private int max_upload = -1;
-	
-	@Option(name = "-gpu", usage = "CUDA name of the GPU used for the render, for example CUDA_0", metaVar = "CUDA_0", required = false)
+
+	@Option(name = "--gpu", aliases = {"-g"}, usage = "CUDA name of the GPU used for the render, for example CUDA_0", metaVar = "CUDA_0")
 	private String gpu_device = null;
-	
-	@Option(name = "-compute-method", usage = "CPU: only use cpu, GPU: only use gpu, CPU_GPU: can use cpu and gpu (not at the same time) if -gpu is not use it will not use the gpu", metaVar = "CPU_GPU", required = false)
+
+	@Option(name = "--compute-method", aliases = {"-m"}, usage = "CPU: only use cpu, GPU: only use gpu, CPU_GPU: can use cpu OR gpu, if -gpu is not set it will not use the gpu", metaVar = "CPU_GPU")
 	private String method = null;
-	
-	@Option(name = "-cores", usage = "Number of core/thread to use for the render", metaVar = "3", required = false)
+
+	@Option(name = "--cores", usage = "Number of core/thread to use for the render", metaVar = "3")
 	private int nb_cores = -1;
-	
-	@Option(name = "--verbose", usage = "Display log", required = false)
+
+	@Option(name = "--verbose", aliases = {"-log"}, usage = "Display log")
 	private boolean print_log = false;
-	
-	@Option(name = "-request-time", usage = "H1:M1-H2:M2,H3:M3-H4:M4 Use the 24h format. For example to request job between 2am-8.30am and 5pm-11pm you should do --request-time 2:00-8:30,17:00-23:00 Caution, it's the requesting job time to get a project not the working time", metaVar = "2:00-8:30,17:00-23:00", required = false)
+
+	@Option(name = "--request-time", usage = "H1:M1-H2:M2,H3:M3-H4:M4 Use the 24h format\nFor example to request job between 2am-8.30am and 5pm-11pm you should do --request-time 2:00-8:30,17:00-23:00\nCaution, it's the requesting job time to get a project not the working time", metaVar = "2:00-8:30,17:00-23:00")
 	private String request_time = null;
-	
-	@Option(name = "-proxy", usage = "URL of the proxy", metaVar = "http://login:password@host:port", required = false)
+
+	@Option(name = "--proxy", usage = "URL of the proxy", metaVar = "http://login:passwd@host:port")
 	private String proxy = null;
-	
-	@Option(name = "-extras", usage = "Extras data push on the authentication request", required = false)
+
+	@Option(name = "--extras", aliases = {"-e"}, usage = "Extras data push on the authentication request")
 	private String extras = null;
-	
-	@Option(name = "-ui", usage = "Specify the user interface to you use, default 'text', available 'oneline', 'text'", required = false)
-	private String ui_type = "text";
-	
-	@Option(name = "--version", usage = "Display application version", required = false)
+
+	@Option(name = "--oneline", aliases = {"-ol"}, usage="Use oneliner interface")
+	private boolean ui_oneline = false;
+
+	@Option(name = "--version", aliases = {"-v"}, usage = "Display application version")
 	private boolean display_version = false;
-	
+
+	@Option(name = "--config", aliases = {"-c"}, usage = "Specify a config file with the options in it.\nSee README for syntax and samples.", metaVar = "sample.conf")
+	private String config_file = null;
+
 	public static void main(String[] args) {
 		new Worker().doMain(args);
 	}
-	
-	public void doMain(String[] args) {
+
+	public void doMain(String[] args_) {
 		CmdLineParser parser = new CmdLineParser(this);
+		if (args_.length == 0) {
+			parser.printUsage(System.out);
+			return;
+		}
 		try {
-			parser.parseArgument(args);
+			ArrayList args = new ArrayList(Arrays.asList(args_));
+			for (int i = 0; i < args.size(); i++) {
+				if (args.get(i).equals("-c") || args.get(i).equals("--config")) {
+					args.remove(i);
+					for (String line : Files.readAllLines(Paths.get((String)args.remove(i)), StandardCharsets.UTF_8))
+						args.add(i++, "--" + line);
+				}
+			}
+			parser.parseArgument(String.join(" ", args).split("\\s+"));
+		}
+		catch (IOException e) {
+			System.err.println(e);
+			return;
 		}
 		catch (CmdLineException e) {
-			if (display_version) {
-				System.out.println("Version: " + new Configuration(null, "", "").getJarVersion());
-				return;
-			}
 			System.err.println(e.getMessage());
 			System.err.println("Usage: ");
 			parser.printUsage(System.err);
@@ -107,23 +125,23 @@ public class Worker {
 			System.err.println("Example: java " + this.getClass().getName() + " " + parser.printExample(REQUIRED));
 			return;
 		}
-		
+
 		if (display_version) {
 			System.out.println("Version: " + new Configuration(null, "", "").getJarVersion());
 			return;
 		}
-		
+
 		ComputeType compute_method = ComputeType.CPU_GPU;
 		Configuration config = new Configuration(null, login, password);
 		config.setPrintLog(print_log);
-		
+
 		if (cache_dir != null) {
 			File a_dir = new File(cache_dir);
 			if (a_dir.isDirectory() && a_dir.canWrite()) {
 				config.setCacheDir(a_dir);
 			}
 		}
-		
+
 		if (max_upload != -1) {
 			if (max_upload <= 0) {
 				System.err.println("Error: max upload should be a greater than zero");
@@ -131,7 +149,7 @@ public class Worker {
 			}
 			config.setMaxUploadingJob(max_upload);
 		}
-		
+
 		if (gpu_device != null) {
 			String cuda_str = "CUDA_";
 			if (gpu_device.startsWith(cuda_str) == false) {
@@ -152,19 +170,19 @@ public class Worker {
 			}
 			config.setUseGPU(gpu);
 		}
-		
+
 		if (request_time != null) {
 			String[] intervals = request_time.split(",");
 			if (intervals != null) {
 				config.requestTime = new LinkedList<Pair<Calendar, Calendar>>();
-				
+
 				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 				for (String interval : intervals) {
 					String[] times = interval.split("-");
 					if (times != null && times.length == 2) {
 						Calendar start = Calendar.getInstance();
 						Calendar end = Calendar.getInstance();
-						
+
 						try {
 							start.setTime(timeFormat.parse(times[0]));
 							end.setTime(timeFormat.parse(times[1]));
@@ -173,7 +191,7 @@ public class Worker {
 							System.err.println("Error: wrong format in request time");
 							System.exit(2);
 						}
-						
+
 						if (start.before(end)) {
 							config.requestTime.add(new Pair<Calendar, Calendar>(start, end));
 						}
@@ -185,7 +203,7 @@ public class Worker {
 				}
 			}
 		}
-		
+
 		if (nb_cores < -1) {
 			System.err.println("Error: use-number-core should be a greater than zero");
 			return;
@@ -193,7 +211,7 @@ public class Worker {
 		else {
 			config.setUseNbCores(nb_cores);
 		}
-		
+
 		if (method != null) {
 			if (method.equalsIgnoreCase("cpu")) {
 				compute_method = ComputeType.CPU_ONLY;
@@ -209,7 +227,7 @@ public class Worker {
 				System.exit(2);
 			}
 		}
-		
+
 		if (proxy != null) {
 			try {
 				URL url = new URL(proxy);
@@ -219,16 +237,16 @@ public class Worker {
 					if (elements.length == 2) {
 						String proxy_user = elements[0];
 						String proxy_password = elements[1];
-						
+
 						if (proxy_user != null && proxy_password != null) {
 							Authenticator.setDefault(new ProxyAuthenticator(proxy_user, proxy_password));
 						}
 					}
 				}
-				
+
 				System.setProperty("http.proxyHost", url.getHost());
 				System.setProperty("http.proxyPort", Integer.toString(url.getPort()));
-				
+
 				System.setProperty("https.proxyHost", url.getHost());
 				System.setProperty("https.proxyPort", Integer.toString(url.getPort()));
 			}
@@ -238,11 +256,11 @@ public class Worker {
 				System.exit(2);
 			}
 		}
-		
+
 		if (extras != null) {
 			config.setExtras(extras);
 		}
-		
+
 		if (compute_method == ComputeType.CPU_ONLY) { // the client was to render with cpu but on the server side project type are cpu+gpu or gpu prefered but never cpu only
 			compute_method = ComputeType.CPU_GPU;
 			config.setComputeMethod(compute_method);
@@ -251,25 +269,17 @@ public class Worker {
 		else {
 			config.setComputeMethod(compute_method); // doing it here because it have to be done after the setUseGPU
 		}
-		
+
 		Log.getInstance(config).debug("client version " + config.getJarVersion());
-		
-		Gui gui;
-		if (ui_type.equals("oneline")) {
-			if (config.getPrintLog()) {
-				System.out.println("OneLine ui can not be used if the verbose mode is enable");
-				System.exit(2); 
-			}
-			gui = new GuiTextOneLine();
+
+		if (ui_oneline && config.getPrintLog()) {
+			System.out.println("OneLine ui can not be used if the verbose mode is enable");
+			System.exit(2);
 		}
-		else {
-			gui = new GuiText();
-		}
-		Client cli = new Client(gui, config, server);
-		
-		ShutdownHook hook = new ShutdownHook(cli);
-		hook.attachShutDownHook();
-		
+		Client cli = new Client(ui_oneline ? new GuiTextOneLine() : new GuiText(), config, server);
+
+		new ShutdownHook(cli).attachShutDownHook();
+
 		cli.run();
 		cli.stop();
 	}

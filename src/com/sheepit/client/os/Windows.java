@@ -31,6 +31,7 @@ import com.sun.jna.platform.win32.WinReg;
 
 public class Windows extends OS {
 	
+	@Override
 	public String name() {
 		return "windows";
 	}

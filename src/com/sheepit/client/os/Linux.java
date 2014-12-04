@@ -37,6 +37,7 @@ public class Linux extends OS {
 		this.hasNiceBinary = null;
 	}
 	
+	@Override
 	public String name() {
 		return "linux";
 	}

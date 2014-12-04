@@ -74,6 +74,7 @@ public class Client {
 		this.running = true;
 	}
 	
+	@Override
 	public String toString() {
 		return String.format("Client (config %s, server %s)", this.config, this.server);
 	}
@@ -113,6 +114,7 @@ public class Client {
 			
 			// create a thread who will send the frame
 			Runnable runnable_sender = new Runnable() {
+				@Override
 				public void run() {
 					senderLoop();
 				}
@@ -313,7 +315,7 @@ public class Client {
 		while (true) {
 			Job job_to_send;
 			try {
-				job_to_send = (Job) jobsToValidate.take();
+				job_to_send = jobsToValidate.take();
 				this.log.debug("will validate " + job_to_send);
 				//gui.status("Sending frame");
 				ret = confirmJob(job_to_send);
@@ -601,6 +603,7 @@ public class Client {
 		final String namefile_without_extension = ajob.getPrefixOutputImage() + ajob.getFrameNumber();
 		
 		FilenameFilter textFilter = new FilenameFilter() {
+			@Override
 			public boolean accept(File dir, String name) {
 				return name.startsWith(namefile_without_extension);
 			}

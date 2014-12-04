@@ -67,6 +67,7 @@ public class Configuration {
 		this.extras = "";
 	}
 	
+	@Override
 	public String toString() {
 		return String.format("Configuration (workingDirectory '%s')", this.workingDirectory.getAbsolutePath());
 	}

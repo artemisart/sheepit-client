@@ -35,6 +35,7 @@ public class Mac extends OS {
 		this.hasNiceBinary = null;
 	}
 	
+	@Override
 	public String name() {
 		return "mac";
 	}

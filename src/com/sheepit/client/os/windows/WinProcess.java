@@ -149,6 +149,7 @@ public class WinProcess {
 		return result;
 	}
 	
+	@Override
 	public String toString() {
 		return "WinProcess(pid: " + this.pid + ", handle " + this.handle + ")";
 	}

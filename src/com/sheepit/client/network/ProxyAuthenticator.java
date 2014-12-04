@@ -32,6 +32,7 @@ public class ProxyAuthenticator extends Authenticator {
 		this.password = password;
 	}
 	
+	@Override
 	protected PasswordAuthentication getPasswordAuthentication() {
 		return new PasswordAuthentication(user, password.toCharArray());
 	}

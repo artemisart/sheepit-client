@@ -100,6 +100,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		this.keepmealive_duration = 15 * 60 * 1000; // default 15min
 	}
 	
+	@Override
 	public void run() {
 		this.stayAlive();
 	}
@@ -154,6 +155,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		}
 	}
 	
+	@Override
 	public String toString() {
 		return String.format("Server (base_url '%s', user_config %s, pages %s", this.base_url, this.user_config, this.pages);
 	}
@@ -525,7 +527,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			fos.close();
 			inStrm.close();
 			long end = new Date().getTime();
-			this.log.debug(String.format("File downloaded at %.1f kB/s", ((float) (size / 1000)) / ((float) (end - start) / 1000)));
+			this.log.debug(String.format("File downloaded at %.1f kB/s", (size / 1000) / ((float) (end - start) / 1000)));
 			this.lastRequestTime = new Date().getTime();
 			return 0;
 		}

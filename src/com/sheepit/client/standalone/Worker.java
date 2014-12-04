@@ -102,7 +102,7 @@ public class Worker {
 			return;
 		}
 		try {
-			ArrayList args = new ArrayList(Arrays.asList(args_));
+			ArrayList<String> args = new ArrayList<String>(Arrays.asList(args_));
 			for (int i = 0; i < args.size(); i++) {
 				if (args.get(i).equals("-c") || args.get(i).equals("--config")) {
 					args.remove(i);

@@ -49,6 +49,9 @@ public class Worker {
 	@Option(name = "--server", aliases = { "-s" }, usage = "Render-farm server, default https://www.sheepit-renderfarm.com", metaVar = "URL")
 	private String server = "https://www.sheepit-renderfarm.com";
 	
+	@Option(name = "--interactive", aliases = { "-i" }, usage = "Enable interactive prompt for login and password")
+	private boolean interactive_prompt = false;
+	
 	@Option(name = "--login", aliases = { "-l" }, usage = "User's login", metaVar = "USERNAME")
 	private String login = "";
 	
@@ -111,6 +114,12 @@ public class Worker {
 				}
 			}
 			parser.parseArgument(String.join(" ", args).split("\\s+"));
+			if (interactive_prompt) {
+				if (login.length() == 0)
+					login = System.console().readLine("Login:");
+				if (password.length() == 0)
+					password = new String(System.console().readPassword("Password:"));
+			}
 		}
 		catch (IOException e) {
 			System.err.println(e);

@@ -136,8 +136,13 @@ public class Worker {
 		
 		if (cache_dir != null) {
 			File a_dir = new File(cache_dir);
+			if (!a_dir.exists())
+				a_dir.mkdirs();
 			if (a_dir.isDirectory() && a_dir.canWrite()) {
 				config.setCacheDir(a_dir);
+			}
+			else {
+				System.out.println("Bad cache dir, using default one.");
 			}
 		}
 		

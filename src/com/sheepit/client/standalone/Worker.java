@@ -98,22 +98,23 @@ public class Worker {
 		new Worker().doMain(args);
 	}
 	
-	public void doMain(String[] args_) {
+	public void doMain(String[] args) {
 		CmdLineParser parser = new CmdLineParser(this);
-		if (args_.length == 0) {
+		if (args.length == 0) {
 			parser.printUsage(System.out);
 			return;
 		}
 		try {
-			ArrayList<String> args = new ArrayList<String>(Arrays.asList(args_));
-			for (int i = 0; i < args.size(); i++) {
-				if (args.get(i).equals("-c") || args.get(i).equals("--config")) {
-					args.remove(i);
-					for (String line : Files.readAllLines(Paths.get((String) args.remove(i)), StandardCharsets.UTF_8))
-						args.add(i++, "--" + line);
-				}
+			Matcher re = Pattern.compile("(-c|--config)\\s+(\\S+)").matcher(String.join(" ", args));
+			StringBuffer sb = new StringBuffer();
+			while (re.find()) {
+				re.appendReplacement(sb, "");
+				for (String line : Files.readAllLines(Paths.get(re.group(2)), StandardCharsets.UTF_8))
+					if (!line.startsWith("#"))
+						sb.append('-').append('-').append(line).append(' ');
+				re.appendTail(sb);
 			}
-			parser.parseArgument(String.join(" ", args).split("\\s+"));
+			parser.parseArgument((sb.length() == 0 ? args : sb.toString().split("\\s+")));
 			if (interactive_prompt) {
 				if (login.length() == 0)
 					login = System.console().readLine("Login:");

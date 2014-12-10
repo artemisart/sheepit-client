@@ -31,7 +31,6 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -92,16 +91,13 @@ public class Client {
 	}
 	
 	public int run() {
-		int step;
 		try {
-			step = this.log.newCheckPoint();
+			int step = this.log.newCheckPoint();
 			this.gui.status("Starting");
 			
 			this.config.cleanWorkingDirectory();
 			
-			Error.Type ret;
-			ret = this.server.getConfiguration();
-			
+			Error.Type ret = this.server.getConfiguration();
 			if (ret != Error.Type.OK) {
 				this.gui.error(Error.humainString(ret));
 				if (ret != Error.Type.AUTHENTICATION_FAILED) {
@@ -311,14 +307,12 @@ public class Client {
 	
 	public int senderLoop() {
 		int step = log.newCheckPoint();
-		Error.Type ret;
 		while (true) {
-			Job job_to_send;
 			try {
-				job_to_send = jobsToValidate.take();
+				Job job_to_send = jobsToValidate.take();
 				this.log.debug("will validate " + job_to_send);
 				//gui.status("Sending frame");
-				ret = confirmJob(job_to_send);
+				Error.Type ret = confirmJob(job_to_send);
 				if (ret != Error.Type.OK) {
 					this.gui.error(Error.humainString(ret));
 					sendError(step);
@@ -348,8 +342,7 @@ public class Client {
 			temp_file.deleteOnExit();
 			FileOutputStream writer = new FileOutputStream(temp_file);
 			
-			ArrayList<String> logs = this.log.getForCheckPoint(step_);
-			for (String line : logs) {
+			for (String line : this.log.getForCheckPoint(step_)) {
 				writer.write(line.getBytes());
 				writer.write('\n');
 			}
@@ -407,18 +400,10 @@ public class Client {
 				if (start.before(now) && now.before(end)) {
 					return null;
 				}
-				if (start.after(now)) {
-					if (next == null) {
-						next = start;
-					}
-					else {
-						if (start.before(next)) {
-							next = start;
-						}
-					}
+				if (start.after(now) && (next == null || start.before(next))) {
+					next = start;
 				}
 			}
-			
 			return next;
 		}
 	}
@@ -479,7 +464,6 @@ public class Client {
 		else {
 			core_script += "import bpy\n" + "bpy.context.user_preferences.system.compute_device_type = \"NONE\"" + "\n" + "bpy.context.scene.cycles.device = \"CPU\"" + "\n" + "bpy.context.scene.render.tile_x = 32" + "\n" + "bpy.context.scene.render.tile_y = 32" + "\n";
 		}
-		File script_file = null;
 		String command1[] = ajob.getRenderCommand().split(" ");
 		int size_command = command1.length + 2; // + 2 for script
 		
@@ -487,22 +471,18 @@ public class Client {
 			size_command += 2;
 		}
 		
+		File script_file = null;
 		String[] command = new String[size_command];
-		
 		int index = 0;
 		for (int i = 0; i < command1.length; i++) {
 			if (command1[i].equals(".c")) {
-				command[index] = ajob.getScenePath();
-				index += 1;
-				command[index] = "-P";
-				index += 1;
+				command[index++] = ajob.getScenePath();
+				command[index++] = "-P";
 				
 				try {
 					script_file = File.createTempFile("script_", "", this.config.workingDirectory);
 					File file = new File(script_file.getAbsolutePath());
-					FileWriter txt;
-					txt = new FileWriter(file);
-					
+					FileWriter txt = new FileWriter(file);
 					PrintWriter out = new PrintWriter(txt);
 					out.write(ajob.getScript());
 					out.write("\n");
@@ -521,10 +501,8 @@ public class Client {
 				command[index] = ajob.getRendererPath();
 				// the number of cores have to be put after the binary and before the scene arg
 				if (this.config.getNbCores() > 0) {
-					index += 1;
-					command[index] = "-t";
-					index += 1;
-					command[index] = Integer.toString(this.config.getNbCores());
+					command[++index] = "-t";
+					command[++index] = Integer.toString(this.config.getNbCores());
 					//index += 1; // do not do it, it will be done at the end of the loop 
 				}
 			}
@@ -587,14 +565,12 @@ public class Client {
 		}
 		catch (IllegalThreadStateException e) {
 			// the process is not finished yet
-			exit_value = 0;
 		}
 		catch (Exception e) {
 			// actually is for java.io.IOException: GetExitCodeProcess error=6, The handle is invalid
 			// it was not declared throwable
 			
 			// the process is not finished yet
-			exit_value = 0;
 		}
 		
 		ajob.setProcess(null);
@@ -663,18 +639,14 @@ public class Client {
 		}
 		else {
 			// we must download the archive
-			int ret;
-			String real_url;
-			real_url = String.format("%s?type=job&job=%s&revision=%s", this.server.getPage("download-archive"), ajob_.getId(), ajob_.getRevision());
-			ret = this.server.HTTPGetFile(real_url, achive_local_path, this.gui, "Downloading scene %s %%");
+			String real_url = String.format("%s?type=job&job=%s&revision=%s", this.server.getPage("download-archive"), ajob_.getId(), ajob_.getRevision());
+			int ret = this.server.HTTPGetFile(real_url, achive_local_path, this.gui);
 			if (ret != 0) {
 				this.gui.error("Client::downloadSceneFile problem with Utils.DownloadFile returned " + ret);
 				return -1;
 			}
 			
-			String md5_local;
-			md5_local = Utils.md5(achive_local_path);
-			
+			String md5_local = Utils.md5(achive_local_path);
 			if (md5_local.equals(ajob_.getSceneMD5()) == false) {
 				System.err.println("md5 of the downloaded file  and the local file are not the same (local '" + md5_local + "' scene: '" + ajob_.getSceneMD5() + "')");
 				this.log.error("Client::downloadSceneFile mismatch on md5  local: '" + md5_local + "' server: '" + ajob_.getSceneMD5() + "'");
@@ -687,8 +659,7 @@ public class Client {
 	
 	protected int downloadExecutable(Job ajob) {
 		this.gui.status("Downloading renderer");
-		String real_url = new String();
-		real_url = String.format("%s?type=binary&job=%s", this.server.getPage("download-archive"), ajob.getId());
+		String real_url = String.format("%s?type=binary&job=%s", this.server.getPage("download-archive"), ajob.getId());
 		
 		// we have the MD5 of the renderer archive
 		String renderer_achive_local_path = ajob.getRendererArchivePath();
@@ -699,16 +670,15 @@ public class Client {
 		}
 		else {
 			// we must download the archive
-			int ret;
-			ret = this.server.HTTPGetFile(real_url, renderer_achive_local_path, this.gui, "Downloading renderer %s %%");
+			int ret = this.server.HTTPGetFile(real_url, renderer_achive_local_path, this.gui);
+			this.gui.status(""); // newline
 			if (ret != 0) {
 				this.gui.error("Client::downloadExecutable problem with Utils.DownloadFile returned " + ret);
 				return -9;
 			}
 		}
 		
-		String md5_local;
-		md5_local = Utils.md5(renderer_achive_local_path);
+		String md5_local = Utils.md5(renderer_achive_local_path);
 		
 		if (md5_local.equals(ajob.getRenderMd5()) == false) {
 			this.log.error("Client::downloadExecutable mismatch on md5  local: '" + md5_local + "' server: '" + ajob.getRenderMd5() + "'");
@@ -719,7 +689,6 @@ public class Client {
 	}
 	
 	protected int prepareWorkeableDirectory(Job ajob) {
-		int ret;
 		String renderer_archive = ajob.getRendererArchivePath();
 		String renderer_path = ajob.getRendererDirectory();
 		File renderer_path_file = new File(renderer_path);
@@ -732,7 +701,7 @@ public class Client {
 			renderer_path_file.mkdir();
 			
 			// unzip the archive
-			ret = Utils.unzipFileIntoDirectory(renderer_archive, renderer_path);
+			int ret = Utils.unzipFileIntoDirectory(renderer_archive, renderer_path);
 			if (ret != 0) {
 				this.gui.error("Client::prepareWorkeableDirectory, error with Utils.unzipFileIntoDirectory of the renderer (returned " + ret + ")");
 				return -1;
@@ -751,7 +720,7 @@ public class Client {
 			scene_path_file.mkdir();
 			
 			// unzip the archive
-			ret = Utils.unzipFileIntoDirectory(scene_archive, scene_path);
+			int ret = Utils.unzipFileIntoDirectory(scene_archive, scene_path);
 			if (ret != 0) {
 				this.gui.error("Client::prepareWorkeableDirectory, error with Utils.unzipFileIntoDirectory of the scene (returned " + ret + ")");
 				return -2;
@@ -868,23 +837,12 @@ public class Client {
 		String[] elements = line.toLowerCase().split("(peak)");
 		
 		for (String element : elements) {
-			if (element.isEmpty() == false && element.charAt(0) == ' ') {
-				int end = element.indexOf(')');
+			if (element.isEmpty() == false && (element.charAt(0) == ' ' || element.charAt(0) == ':')) {
+				int end = element.indexOf(element.charAt(0) == ' ' ? ')' : '|');
 				if (end > 0) {
 					long mem = Utils.parseNumber(element.substring(1, end).trim());
 					if (mem > ajob.getMemoryUsed()) {
 						ajob.setMemoryUsed(mem);
-					}
-				}
-			}
-			else {
-				if (element.isEmpty() == false && element.charAt(0) == ':') {
-					int end = element.indexOf('|');
-					if (end > 0) {
-						long mem = Utils.parseNumber(element.substring(1, end).trim());
-						if (mem > ajob.getMemoryUsed()) {
-							ajob.setMemoryUsed(mem);
-						}
 					}
 				}
 			}

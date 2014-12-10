@@ -19,7 +19,7 @@ To create the jar file, simply type "ant".
 ## Usage
 
 Once you have a jar file you look at the usage by doing "java -jar bin/sheepit-client.jar".
-When you are doing your development you can use a mirror of the main site who is specially made for demo/dev, it is localted at **http://www-demo.sheepit-renderfarm.com**
+When you are doing your development you can use a mirror of the main site who is specially made for demo/dev, it is located at **http://www-demo.sheepit-renderfarm.com**
 
 ## Configuration file
 

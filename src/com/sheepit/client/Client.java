@@ -216,7 +216,7 @@ public class Client {
 				
 				ret = this.work(this.renderingJob);
 				if (ret != Error.Type.OK) {
-					Job frame_to_reset = this.renderingJob; // copie it because the sendError will take ~5min to execute
+					Job frame_to_reset = this.renderingJob; // copy it because the sendError will take ~5min to execute
 					this.renderingJob = null;
 					this.gui.error(Error.humainString(ret));
 					this.sendError(step, frame_to_reset, ret);

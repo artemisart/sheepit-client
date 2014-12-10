@@ -275,7 +275,7 @@ public class Worker {
 			config.setExtras(extras);
 		}
 		
-		if (compute_method == ComputeType.CPU_ONLY) { // the client was to render with cpu but on the server side project type are cpu+gpu or gpu prefered but never cpu only
+		if (compute_method == ComputeType.CPU_ONLY) { // the client was to render with cpu but on the server side project type are cpu+gpu or gpu preferred but never cpu only
 			compute_method = ComputeType.CPU_GPU;
 			config.setComputeMethod(compute_method);
 			config.setUseGPU(null); // remove the GPU

@@ -59,6 +59,7 @@ public class Client {
 	
 	private boolean disableErrorSending;
 	private boolean running;
+	private boolean suspended;
 	
 	public Client(Gui gui_, Configuration config, String url_) {
 		this.config = config;
@@ -71,6 +72,7 @@ public class Client {
 		
 		this.disableErrorSending = false;
 		this.running = true;
+		this.suspended = false;
 	}
 	
 	@Override
@@ -121,6 +123,11 @@ public class Client {
 			this.renderingJob = null;
 			
 			while (this.running == true) {
+				synchronized(this) {
+					while(this.suspended) {
+						wait();
+					}
+				}
 				step = this.log.newCheckPoint();
 				try {
 					Calendar next_request = this.nextJobRequest();
@@ -215,6 +222,11 @@ public class Client {
 				this.log.debug("Got work to do id: " + this.renderingJob.getId() + " frame: " + this.renderingJob.getFrameNumber());
 				
 				ret = this.work(this.renderingJob);
+				if (ret == Error.Type.RENDERER_KILLED) {
+				    this.log.removeCheckPoint(step);
+				    continue;
+				}
+				
 				if (ret != Error.Type.OK) {
 					Job frame_to_reset = this.renderingJob; // copy it because the sendError will take ~5min to execute
 					this.renderingJob = null;
@@ -229,6 +241,9 @@ public class Client {
 					if (ret != Error.Type.OK) {
 						gui.error("Client::renderingManagement problem with confirmJob (returned " + ret + ")");
 						sendError(step);
+					}
+					else {
+						gui.AddFrameRendered();
 					}
 				}
 				else {
@@ -271,6 +286,7 @@ public class Client {
 		if (this.renderingJob != null) {
 			if (this.renderingJob.getProcess() != null) {
 				OS.getOS().kill(this.renderingJob.getProcess());
+				this.renderingJob.setAskForRendererKill(true);
 			}
 		}
 		
@@ -298,6 +314,15 @@ public class Client {
 		
 		this.gui.stop();
 		return 0;
+	}
+	
+	public void suspend() {
+		suspended = true;
+	}
+	
+	public synchronized void resume() {
+		suspended = false;
+		notify();
 	}
 	
 	public void askForStop() {
@@ -530,17 +555,23 @@ public class Client {
 			
 			long last_update_status = 0;
 			this.log.debug("renderer output");
-			while ((line = input.readLine()) != null) {
-				nb_lines++;
-				this.updateRenderingMemoryPeak(line, ajob);
-				
-				this.log.debug(line);
-				if ((new Date().getTime() - last_update_status) > 2000) { // only call the update every two seconds
-					this.updateRenderingStatus(line, nb_lines, ajob);
-					last_update_status = new Date().getTime();
+			try {
+				while ((line = input.readLine()) != null) {
+					nb_lines++;
+					this.updateRenderingMemoryPeak(line, ajob);
+					
+					this.log.debug(line);
+					if ((new Date().getTime() - last_update_status) > 2000) { // only call the update every two seconds
+						this.updateRenderingStatus(line, nb_lines, ajob);
+						last_update_status = new Date().getTime();
+					}
 				}
+				input.close();
 			}
-			input.close();
+			catch (IOException err1) { // for the input.readline
+				// most likely The handle is invalid
+				this.log.error("Client:runRenderer exception(B) (silent error) " + err1);
+			}
 			this.log.debug("end of rendering");
 		}
 		catch (Exception err) {
@@ -589,6 +620,11 @@ public class Client {
 		
 		if (files.length == 0) {
 			this.log.error("Client::runRenderer no picture file found (after finished render (namefile_without_extension " + namefile_without_extension + ")");
+			
+			if (ajob.getAskForRendererKill()) {
+			    this.log.debug("Client::runRenderer renderer didn't generate any frame but it due to a kill request");
+			    return Error.Type.RENDERER_KILLED;
+			}
 			
 			String basename = "";
 			try {

@@ -80,12 +80,13 @@ public class WinProcess {
 	}
 	
 	public WinProcess(int pid_) throws IOException {
+		this();
 		this.handle = Kernel32.INSTANCE.OpenProcess(0x0400 | // PROCESS_QUERY_INFORMATION
 													0x0800 | // PROCESS_SUSPEND_RESUME
 													0x0001 | // PROCESS_TERMINATE
 													0x0200 | // PROCESS_SET_INFORMATION
 													0x00100000, // SYNCHRONIZE
-													false, pid);
+													false, pid_);
 		if (this.handle == null) {
 			throw new IOException("OpenProcess failed: " + Kernel32Util.formatMessageFromLastErrorCode(Kernel32.INSTANCE.GetLastError()) + " (pid: " + pid_ + ")");
 		}
@@ -95,7 +96,7 @@ public class WinProcess {
 	@Override
 	protected void finalize() throws Throwable {
 		if (this.handle != null) {
-			Kernel32.INSTANCE.CloseHandle(this.handle);
+			// Kernel32.INSTANCE.CloseHandle(this.handle); // do not close the handle because the parent Process object might still alive
 			this.handle = null;
 		}
 		this.pid = -1;
@@ -122,6 +123,7 @@ public class WinProcess {
 	
 	private void terminate() {
 		Kernel32.INSTANCE.TerminateProcess(this.handle, 0);
+		Kernel32.INSTANCE.CloseHandle(this.handle); // we are sure that the parent Process object is dead
 	}
 	
 	private List<WinProcess> getChildren() throws IOException {

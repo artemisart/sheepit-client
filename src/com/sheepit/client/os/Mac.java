@@ -19,6 +19,7 @@
 package com.sheepit.client.os;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -38,6 +39,11 @@ public class Mac extends OS {
 	@Override
 	public String name() {
 		return "mac";
+	}
+	
+	@Override
+	public String getRenderBinaryPath() {
+		return "Blender" + File.separator + "blender.app" + File.separator + "Contents" + File.separator + "MacOS" + File.separator + "blender";
 	}
 	
 	@Override

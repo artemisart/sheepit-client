@@ -111,22 +111,22 @@ public class Error {
 		}
 	}
 	
-	public static String humainString(Type in) {
+	public static String humanString(Type in) {
 		switch (in) {
 			case TOO_OLD_CLIENT:
 				return "This client is too old, you need to update it";
 			case AUTHENTICATION_FAILED:
 				return "Failed to authenticate, please check your login and password";
 			case NOOUTPUTFILE:
-				return "Renderer have generated no output file, it's mostly a wrong project configuration or your are missing required libraries. Will try an another project in few minutes.";
+				return "Renderer generated no output file, it's mostly a wrong project configuration or your are missing required libraries. Will try an another project in few minutes.";
 			case RENDERER_CRASHED:
-				return "Renderer have crashed. It's mostly due to a bad project or not enough memory. There is nothing you can do about it. Will try an another project in few minutes.";
+				return "Renderer crashed. It's often because of a bad project or not enough memory. There is nothing you can do about it. Will try an another project in few minutes.";
 			case RENDERER_MISSING_LIBRARIES:
-				return "Failed to launch runderer. Please check if you have necessary libraries installed and if you have enough free place in working directory.";
+				return "Failed to launch renderer. Please check if you have necessary libraries installed and if you have enough free place in working directory.";
 			case RENDERER_KILLED:
-			    return "The render stop because either you ask to stop or the server (usually render time too high).";
+				return "The renderer stopped because either you asked it or the server did (usually for a render time too high).";
 			case SESSION_DISABLED:
-				return "The server have disabled your session. It's mostly because your client generate broken frame (gpu not compatible for example).";
+				return "The server have disabled your session. Your client may have generated a broken frame (GPU not compatible, not enough RAM/VRAM, etc).";
 			default:
 				return in.toString();
 		}

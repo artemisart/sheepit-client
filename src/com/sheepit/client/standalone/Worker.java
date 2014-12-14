@@ -284,17 +284,17 @@ public class Worker {
 		}
 		
 		if (compute_method == ComputeType.CPU_ONLY && config.getGPUDevice() != null) {
-			System.err.println("You choose to only use the CPU but a GPU was also provided. You can not do bought.");
+			System.err.println("You choose to use the CPU only but a GPU was also provided. You can not do both.");
 			System.err.println("Aborting");
 			System.exit(2);
 		}
 		else if (compute_method == ComputeType.CPU_GPU && config.getGPUDevice() == null) {
-			System.err.println("You choose to only use the CPU and GPU but no GPU device was provided.");
+			System.err.println("You choose to use the CPU and GPU but no GPU device was provided.");
 			System.err.println("Aborting");
 			System.exit(2);
 		}
 		else if (compute_method == ComputeType.GPU_ONLY && config.getGPUDevice() == null) {
-			System.err.println("You choose to only use the GPU but no GPU device was provided.");
+			System.err.println("You choose to use the GPU only but no GPU device was provided.");
 			System.err.println("Aborting");
 			System.exit(2);
 		}
@@ -307,7 +307,7 @@ public class Worker {
 		Log.getInstance(config).debug("client version " + config.getJarVersion());
 		
 		if (ui_oneline && config.getPrintLog()) {
-			System.out.println("OneLine ui can not be used if the verbose mode is enable");
+			System.out.println("OneLine ui can not be used if the verbose mode is enabled.");
 			System.exit(2);
 		}
 		Client cli = new Client(ui_oneline ? new GuiTextOneLine() : new GuiText(), config, server);

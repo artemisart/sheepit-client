@@ -93,6 +93,15 @@ public class Client {
 	}
 	
 	public int run() {
+		if (this.config.checkOSisSupported() == false) {
+			this.gui.error(Error.humanString(Error.Type.OS_NOT_SUPPORTED));
+			return -3;
+		}
+		
+		if (this.config.checkCPUisSUpported() == false) {
+			this.gui.error(Error.humanString(Error.Type.CPU_NOT_SUPPORTED));
+			return -4;
+		}
 		try {
 			int step = this.log.newCheckPoint();
 			this.gui.status("Starting");
@@ -279,7 +288,6 @@ public class Client {
 	}
 	
 	public synchronized int stop() {
-		System.out.println("Client::stop");
 		this.running = false;
 		this.disableErrorSending = true;
 		
@@ -434,10 +442,6 @@ public class Client {
 	}
 	
 	public Error.Type work(Job ajob) {
-		if (ajob.workable() == false) {
-			this.log.error("Client::work The received job is not workable");
-			return Error.Type.WRONG_CONFIGURATION;
-		}
 		int ret;
 		
 		ret = this.downloadExecutable(ajob);
@@ -622,8 +626,8 @@ public class Client {
 			this.log.error("Client::runRenderer no picture file found (after finished render (namefile_without_extension " + namefile_without_extension + ")");
 			
 			if (ajob.getAskForRendererKill()) {
-				this.log.debug("Client::runRenderer renderer didn't generate any frame but died due to a kill request");
-				return Error.Type.RENDERER_KILLED;
+			    this.log.debug("Client::runRenderer renderer didn't generate any frame but died due to a kill request");
+			    return Error.Type.RENDERER_KILLED;
 			}
 			
 			String basename = "";

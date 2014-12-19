@@ -26,16 +26,16 @@ import com.sheepit.client.os.OS;
 import com.sun.jna.Native;
 
 public class GPU {
-	public static List<GPUDevice> devices = null;
+	private static List<GPUDevice> devices = null;
 	
-	public static boolean generate() {
+	private static boolean generate() {
 		OS os = OS.getOS();
 		String path = os.getCUDALib();
 		if (path == null) {
 			System.out.println("GPU.listDevices failed to get CUDA lib");
 			return false;
 		}
-		CUDA cudalib = null;
+		CUDA cudalib;
 		try {
 			cudalib = (CUDA) Native.loadLibrary(path, CUDA.class);
 		}
@@ -51,10 +51,8 @@ public class GPU {
 			System.out.println("GPU.listDevices generic exception " + e);
 			return false;
 		}
-		
-		int result = CUresult.CUDA_ERROR_UNKNOWN;
-		
-		result = cudalib.cuInit(0);
+
+		int result = cudalib.cuInit(0);
 		if (result != CUresult.CUDA_SUCCESS) {
 			return false;
 		}
@@ -72,10 +70,10 @@ public class GPU {
 			return false;
 		}
 		
-		devices = new LinkedList<GPUDevice>();
+		devices = new LinkedList<>();
 		
 		for (int num = 0; num < count[0]; num++) {
-			byte name[] = new byte[256];
+			byte[] name = new byte[256];
 			
 			result = cudalib.cuDeviceGetName(name, 256, num);
 			if (result != CUresult.CUDA_SUCCESS) {
@@ -104,7 +102,7 @@ public class GPU {
 			return null;
 		}
 		
-		List<String> devs = new LinkedList<String>();
+		List<String> devs = new LinkedList<>();
 		for (GPUDevice dev : devices) {
 			devs.add(dev.getModel());
 		}

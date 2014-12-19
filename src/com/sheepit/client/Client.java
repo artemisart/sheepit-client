@@ -46,15 +46,15 @@ import com.sheepit.client.exception.FermeExceptionSessionDisabled;
 import com.sheepit.client.os.OS;
 
 public class Client {
-	public static final String UPDATE_METHOD_BY_LINE_NUMBER = "linenumber";
-	public static final String UPDATE_METHOD_BY_REMAINING_TIME = "remainingtime";
+	private static final String UPDATE_METHOD_BY_LINE_NUMBER = "linenumber";
+	private static final String UPDATE_METHOD_BY_REMAINING_TIME = "remainingtime";
 	
-	private Gui gui;
+	private final Gui gui;
 	private Server server;
-	private Configuration config;
-	private Log log;
+	private final Configuration config;
+	private final Log log;
 	private Job renderingJob;
-	private BlockingQueue<Job> jobsToValidate;
+	private final BlockingQueue<Job> jobsToValidate;
 	private boolean isValidatingJob;
 	
 	private boolean disableErrorSending;
@@ -67,7 +67,7 @@ public class Client {
 		this.log = Log.getInstance(this.config);
 		this.gui = gui_;
 		this.renderingJob = null;
-		this.jobsToValidate = new ArrayBlockingQueue<Job>(1024);
+		this.jobsToValidate = new ArrayBlockingQueue<>(1024);
 		this.isValidatingJob = false;
 		
 		this.disableErrorSending = false;
@@ -93,12 +93,12 @@ public class Client {
 	}
 	
 	public int run() {
-		if (this.config.checkOSisSupported() == false) {
+		if (!this.config.checkOSisSupported()) {
 			this.gui.error(Error.humanString(Error.Type.OS_NOT_SUPPORTED));
 			return -3;
 		}
 		
-		if (this.config.checkCPUisSUpported() == false) {
+		if (!this.config.checkCPUisSUpported()) {
 			this.gui.error(Error.humanString(Error.Type.CPU_NOT_SUPPORTED));
 			return -4;
 		}
@@ -131,9 +131,9 @@ public class Client {
 			
 			this.renderingJob = null;
 			
-			while (this.running == true) {
-				synchronized(this) {
-					while(this.suspended) {
+			while (this.running) {
+				synchronized (this) {
+					while (this.suspended) {
 						wait();
 					}
 				}
@@ -164,9 +164,9 @@ public class Client {
 				catch (FermeExceptionSessionDisabled e) {
 					this.gui.error(Error.humanString(Error.Type.SESSION_DISABLED));
 					// should wait forever to actually display the message to the user
-					while (true) {
+					while (Thread.currentThread().isInterrupted()) {
 						try {
-							Thread.sleep(100000);
+							Thread.sleep(100_000); // 100 seconds
 						}
 						catch (InterruptedException e1) {
 						}
@@ -176,10 +176,7 @@ public class Client {
 					// User have no session need to re-authenticate
 					
 					ret = this.server.getConfiguration();
-					if (ret != Error.Type.OK) {
-						this.renderingJob = null;
-					}
-					else {
+					if (ret == Type.OK) {
 						try {
 							Calendar next_request = this.nextJobRequest();
 							if (next_request != null) {
@@ -203,6 +200,9 @@ public class Client {
 							this.renderingJob = null;
 						}
 					}
+					else {
+						this.renderingJob = null;
+					}
 				}
 				catch (FermeException e) {
 					this.gui.error("Client::renderingManagement exception requestJob (1) " + e.getMessage());
@@ -216,7 +216,7 @@ public class Client {
 					this.gui.status(String.format("No job available. Sleeping for 15 minutes (will wake up at ~%tR)", wakeup_time));
 					this.gui.framesRemaining(0);
 					int time_slept = 0;
-					while (time_slept < time_sleep && this.running == true) {
+					while (time_slept < time_sleep && this.running) {
 						try {
 							Thread.sleep(5000);
 						}
@@ -244,23 +244,23 @@ public class Client {
 					this.log.removeCheckPoint(step);
 					continue;
 				}
-				
-				if (this.renderingJob.simultaneousUploadIsAllowed() == false) { // power or compute_method job, need to upload right away
-					ret = confirmJob(this.renderingJob);
-					if (ret != Error.Type.OK) {
-						gui.error("Client::renderingManagement problem with confirmJob (returned " + ret + ")");
-						sendError(step);
-					}
-					else {
-						gui.AddFrameRendered();
-					}
-				}
-				else {
+
+				if (this.renderingJob.simultaneousUploadIsAllowed()) {
 					this.jobsToValidate.add(this.renderingJob);
 					this.renderingJob = null;
 				}
+				else { // power or compute_method job, need to upload right away
+					ret = confirmJob(this.renderingJob);
+					if (ret == Type.OK) {
+						gui.AddFrameRendered();
+					}
+					else {
+						gui.error("Client::renderingManagement problem with confirmJob (returned " + ret + ")");
+						sendError(step);
+					}
+				}
 				
-				while (this.shouldWaitBeforeRender() == true) {
+				while (this.shouldWaitBeforeRender()) {
 					try {
 						Thread.sleep(4000); // wait a little bit
 					}
@@ -271,7 +271,7 @@ public class Client {
 			}
 			
 			// not running but maybe still sending frame
-			while (this.jobsToValidate.size() > 0) {
+			while (!this.jobsToValidate.isEmpty()) {
 				try {
 					Thread.sleep(2300); // wait a little bit
 				}
@@ -338,20 +338,20 @@ public class Client {
 		this.running = false;
 	}
 	
-	public int senderLoop() {
+	void senderLoop() {
 		int step = log.newCheckPoint();
-		while (true) {
+		while (Thread.currentThread().isInterrupted()) {
 			try {
 				Job job_to_send = jobsToValidate.take();
 				this.log.debug("will validate " + job_to_send);
 				//gui.status("Sending frame");
 				Error.Type ret = confirmJob(job_to_send);
-				if (ret != Error.Type.OK) {
-					this.gui.error(Error.humanString(ret));
-					sendError(step);
+				if (ret == Type.OK) {
+					gui.AddFrameRendered();
 				}
 				else {
-					gui.AddFrameRendered();
+					this.gui.error(Error.humanString(ret));
+					sendError(step);
 				}
 			}
 			catch (InterruptedException e) {
@@ -359,11 +359,11 @@ public class Client {
 		}
 	}
 	
-	protected void sendError(int step_) {
+	void sendError(int step_) {
 		this.sendError(step_, null, null);
 	}
 	
-	protected void sendError(int step_, Job job_to_reset_, Error.Type error) {
+	void sendError(int step_, Job job_to_reset_, Error.Type error) {
 		if (this.disableErrorSending) {
 			this.log.debug("Error sending is disable, do not send log");
 			return;
@@ -384,7 +384,7 @@ public class Client {
 			String args = "";
 			if (job_to_reset_ != null) {
 				args = "?frame=" + job_to_reset_.getFrameNumber() + "&job=" + job_to_reset_.getId() + "&render_time=" + job_to_reset_.getRenderDuration();
-				if (job_to_reset_.getExtras() != null && job_to_reset_.getExtras().length() > 0) {
+				if (job_to_reset_.getExtras() != null && !job_to_reset_.getExtras().isEmpty()) {
 					args += "&extras=" + job_to_reset_.getExtras();
 				}
 			}
@@ -395,11 +395,8 @@ public class Client {
 			e1.printStackTrace();
 			// no exception should be raise to actual launcher (applet or standalone)
 		}
-		
-		if (error != null && error == Error.Type.RENDERER_CRASHED) {
-			// do nothing, we can ask for a job right away
-		}
-		else {
+
+		if (!(error != null && error == Error.Type.RENDERER_CRASHED)) {
 			try {
 				Thread.sleep(300000); // sleeping for 5min
 			}
@@ -409,10 +406,9 @@ public class Client {
 	}
 	
 	/**
-	 * 
 	 * @return the date of the next request, or null is there is not delay (null <=> now)
 	 */
-	public Calendar nextJobRequest() {
+	Calendar nextJobRequest() {
 		if (this.config.requestTime == null) {
 			return null;
 		}
@@ -422,7 +418,7 @@ public class Client {
 			for (Pair<Calendar, Calendar> interval : this.config.requestTime) {
 				Calendar start = (Calendar) now.clone();
 				Calendar end = (Calendar) now.clone();
-				start.set(Calendar.SECOND, 00);
+				start.set(Calendar.SECOND, 0);
 				start.set(Calendar.MINUTE, interval.first.get(Calendar.MINUTE));
 				start.set(Calendar.HOUR_OF_DAY, interval.first.get(Calendar.HOUR_OF_DAY));
 				
@@ -441,10 +437,9 @@ public class Client {
 		}
 	}
 	
-	public Error.Type work(Job ajob) {
-		int ret;
-		
-		ret = this.downloadExecutable(ajob);
+	Error.Type work(Job ajob) {
+
+		int ret = this.downloadExecutable(ajob);
 		if (ret != 0) {
 			this.log.error("Client::work problem with downloadExecutable (ret " + ret + ")");
 			return Error.Type.DOWNLOAD_FILE;
@@ -465,12 +460,12 @@ public class Client {
 		File scene_file = new File(ajob.getScenePath());
 		File renderer_file = new File(ajob.getRendererPath());
 		
-		if (scene_file.exists() == false) {
+		if (!scene_file.exists()) {
 			this.log.error("Client::work job preparation failed (scene file '" + scene_file.getAbsolutePath() + "' does not exist)");
 			return Error.Type.MISSING_SCENE;
 		}
 		
-		if (renderer_file.exists() == false) {
+		if (!renderer_file.exists()) {
 			this.log.error("Client::work job preparation failed (renderer file '" + renderer_file.getAbsolutePath() + "' does not exist)");
 			return Error.Type.MISSING_RENDER;
 		}
@@ -484,16 +479,13 @@ public class Client {
 		return Error.Type.OK;
 	}
 	
-	protected Error.Type runRenderer(Job ajob) {
+	Error.Type runRenderer(Job ajob) {
 		this.gui.status("Rendering");
-		String core_script = "";
-		if (ajob.getUseGPU() && this.config.getGPUDevice() != null) {
-			core_script += "import bpy\n" + "bpy.context.user_preferences.system.compute_device_type = \"CUDA\"" + "\n" + "bpy.context.scene.cycles.device = \"GPU\"" + "\n" + "bpy.context.user_preferences.system.compute_device = \"" + this.config.getGPUDevice().getCudaName() + "\"\n" + "bpy.context.scene.render.tile_x = 256" + "\n" + "bpy.context.scene.render.tile_y = 256" + "\n";
-		}
-		else {
-			core_script += "import bpy\n" + "bpy.context.user_preferences.system.compute_device_type = \"NONE\"" + "\n" + "bpy.context.scene.cycles.device = \"CPU\"" + "\n" + "bpy.context.scene.render.tile_x = 32" + "\n" + "bpy.context.scene.render.tile_y = 32" + "\n";
-		}
-		String command1[] = ajob.getRenderCommand().split(" ");
+		String core_script = "import bpy\nbpy.context.user_preferences.system.compute_device_type = ";
+		core_script += ajob.getUseGPU() && this.config.getGPUDevice() != null ?
+				"\"CUDA\"\nbpy.context.scene.cycles.device = \"GPU\"\nbpy.context.user_preferences.system.compute_device = \"" + this.config.getGPUDevice().getCudaName() + "\"\nbpy.context.scene.render.tile_x = 256\nbpy.context.scene.render.tile_y = 256\n" :
+				"\"NONE\"\nbpy.context.scene.cycles.device = \"CPU\"\nbpy.context.scene.render.tile_x = 32\nbpy.context.scene.render.tile_y = 32\n";
+		String[] command1 = ajob.getRenderCommand().split(" ");
 		int size_command = command1.length + 2; // + 2 for script
 		
 		if (this.config.getNbCores() > 0) { // user have specified something
@@ -503,46 +495,48 @@ public class Client {
 		File script_file = null;
 		String[] command = new String[size_command];
 		int index = 0;
-		for (int i = 0; i < command1.length; i++) {
-			if (command1[i].equals(".c")) {
-				command[index++] = ajob.getScenePath();
-				command[index++] = "-P";
-				
-				try {
-					script_file = File.createTempFile("script_", "", this.config.workingDirectory);
-					File file = new File(script_file.getAbsolutePath());
-					FileWriter txt = new FileWriter(file);
-					PrintWriter out = new PrintWriter(txt);
-					out.write(ajob.getScript());
-					out.write("\n");
-					out.write(core_script); // GPU part
-					out.write("\n"); // GPU part
-					out.close();
-					
-					command[index] = script_file.getAbsolutePath();
-				}
-				catch (IOException e) {
-					return Error.Type.UNKNOWN;
-				}
-				script_file.deleteOnExit();
-			}
-			else if (command1[i].equals(".e")) {
-				command[index] = ajob.getRendererPath();
-				// the number of cores have to be put after the binary and before the scene arg
-				if (this.config.getNbCores() > 0) {
-					command[++index] = "-t";
-					command[++index] = Integer.toString(this.config.getNbCores());
-					//index += 1; // do not do it, it will be done at the end of the loop 
-				}
-			}
-			else if (command1[i].equals(".o")) {
-				command[index] = this.config.workingDirectory.getAbsolutePath() + File.separator + ajob.getPrefixOutputImage();
-			}
-			else if (command1[i].equals(".f")) {
-				command[index] = ajob.getFrameNumber();
-			}
-			else {
-				command[index] = command1[i];
+		for (String aCommand1 : command1) {
+			switch (aCommand1) {
+				case ".c":
+					command[index++] = ajob.getScenePath();
+					command[index++] = "-P";
+
+					try {
+						script_file = File.createTempFile("script_", "", this.config.workingDirectory);
+						File file = new File(script_file.getAbsolutePath());
+						FileWriter txt = new FileWriter(file);
+						PrintWriter out = new PrintWriter(txt);
+						out.write(ajob.getScript());
+						out.write("\n");
+						out.write(core_script); // GPU part
+						out.write("\n"); // GPU part
+						out.close();
+
+						command[index] = script_file.getAbsolutePath();
+					}
+					catch (IOException e) {
+						return Type.UNKNOWN;
+					}
+					script_file.deleteOnExit();
+					break;
+				case ".e":
+					command[index] = ajob.getRendererPath();
+					// the number of cores have to be put after the binary and before the scene arg
+					if (this.config.getNbCores() > 0) {
+						command[++index] = "-t";
+						command[++index] = Integer.toString(this.config.getNbCores());
+						//index += 1; // do not do it, it will be done at the end of the loop
+					}
+					break;
+				case ".o":
+					command[index] = this.config.workingDirectory.getAbsolutePath() + File.separator + ajob.getPrefixOutputImage();
+					break;
+				case ".f":
+					command[index] = ajob.getFrameNumber();
+					break;
+				default:
+					command[index] = aCommand1;
+					break;
 			}
 			index += 1;
 		}
@@ -551,15 +545,15 @@ public class Client {
 		
 		int nb_lines = 0;
 		try {
-			String line;
 			this.log.debug(Arrays.toString(command));
 			OS os = OS.getOS();
 			ajob.setProcess(os.exec(command));
 			BufferedReader input = new BufferedReader(new InputStreamReader(ajob.getProcess().getInputStream()));
-			
-			long last_update_status = 0;
+
 			this.log.debug("renderer output");
 			try {
+				String line;
+				long last_update_status = 0;
 				while ((line = input.readLine()) != null) {
 					nb_lines++;
 					this.updateRenderingMemoryPeak(line, ajob);
@@ -667,17 +661,14 @@ public class Client {
 		return Error.Type.OK;
 	}
 	
-	protected int downloadSceneFile(Job ajob_) {
+	int downloadSceneFile(Job ajob_) {
 		this.gui.status("Downloading scene");
 		
 		String achive_local_path = ajob_.getSceneArchivePath();
 		
 		File renderer_achive_local_path_file = new File(achive_local_path);
 		
-		if (renderer_achive_local_path_file.exists()) {
-			// the archive have already been downloaded
-		}
-		else {
+		if (!renderer_achive_local_path_file.exists()) {
 			// we must download the archive
 			String real_url = String.format("%s?type=job&job=%s&revision=%s", this.server.getPage("download-archive"), ajob_.getId(), ajob_.getRevision());
 			int ret = this.server.HTTPGetFile(real_url, achive_local_path, this.gui);
@@ -687,7 +678,7 @@ public class Client {
 			}
 			
 			String md5_local = Utils.md5(achive_local_path);
-			if (md5_local.equals(ajob_.getSceneMD5()) == false) {
+			if (!md5_local.equals(ajob_.getSceneMD5())) {
 				System.err.println("md5 of the downloaded file  and the local file are not the same (local '" + md5_local + "' scene: '" + ajob_.getSceneMD5() + "')");
 				this.log.error("Client::downloadSceneFile mismatch on md5  local: '" + md5_local + "' server: '" + ajob_.getSceneMD5() + "'");
 				// md5 of the file downloaded and the file excepted is not the same
@@ -697,7 +688,7 @@ public class Client {
 		return 0;
 	}
 	
-	protected int downloadExecutable(Job ajob) {
+	int downloadExecutable(Job ajob) {
 		this.gui.status("Downloading renderer");
 		String real_url = String.format("%s?type=binary&job=%s", this.server.getPage("download-archive"), ajob.getId());
 		
@@ -705,10 +696,7 @@ public class Client {
 		String renderer_achive_local_path = ajob.getRendererArchivePath();
 		File renderer_achive_local_path_file = new File(renderer_achive_local_path);
 		
-		if (renderer_achive_local_path_file.exists()) {
-			// the archive have been already downloaded
-		}
-		else {
+		if (!renderer_achive_local_path_file.exists()) {
 			// we must download the archive
 			int ret = this.server.HTTPGetFile(real_url, renderer_achive_local_path, this.gui);
 			this.gui.status(""); // newline
@@ -720,7 +708,7 @@ public class Client {
 		
 		String md5_local = Utils.md5(renderer_achive_local_path);
 		
-		if (md5_local.equals(ajob.getRenderMd5()) == false) {
+		if (!md5_local.equals(ajob.getRenderMd5())) {
 			this.log.error("Client::downloadExecutable mismatch on md5 local: '" + md5_local + "' server: '" + ajob.getRenderMd5() + "'");
 			// md5 do not match the downloaded file
 			return -10;
@@ -728,16 +716,12 @@ public class Client {
 		return 0;
 	}
 	
-	protected int prepareWorkeableDirectory(Job ajob) {
+	int prepareWorkableDirectory(Job ajob) {
 		String renderer_archive = ajob.getRendererArchivePath();
 		String renderer_path = ajob.getRendererDirectory();
 		File renderer_path_file = new File(renderer_path);
 		
-		if (renderer_path_file.exists()) {
-			// Directory already exists -> do nothing
-		}
-		else {
-			// we create the directory
+		if (!renderer_path_file.exists()) {
 			renderer_path_file.mkdir();
 			
 			// unzip the archive
@@ -752,11 +736,7 @@ public class Client {
 		String scene_path = ajob.getSceneDirectory();
 		File scene_path_file = new File(scene_path);
 		
-		if (scene_path_file.exists()) {
-			// Directory already exists -> do nothing
-		}
-		else {
-			// we create the directory
+		if (!scene_path_file.exists()) {
 			scene_path_file.mkdir();
 			
 			// unzip the archive
@@ -770,7 +750,7 @@ public class Client {
 		return 0;
 	}
 	
-	protected Error.Type confirmJob(Job ajob) {
+	Error.Type confirmJob(Job ajob) {
 		String extras_config = "";
 		if (this.config.getNbCores() > 0) {
 			extras_config = "&cores=" + this.config.getNbCores();
@@ -825,7 +805,7 @@ public class Client {
 		return Error.Type.OK;
 	}
 	
-	protected boolean shouldWaitBeforeRender() {
+	boolean shouldWaitBeforeRender() {
 		int concurrent_job = this.jobsToValidate.size();
 		if (this.isValidatingJob) {
 			concurrent_job++;
@@ -833,7 +813,7 @@ public class Client {
 		return (concurrent_job >= this.config.maxUploadingJob());
 	}
 	
-	protected void updateRenderingStatus(String line, int current_number_of_lines, Job ajob) {
+	void updateRenderingStatus(String line, int current_number_of_lines, Job ajob) {
 		if (ajob.getUpdateRenderingStatusMethod() != null && ajob.getUpdateRenderingStatusMethod().equals(Client.UPDATE_METHOD_BY_LINE_NUMBER) && ajob.getMaxOutputNbLines() > 0) {
 			this.gui.status(String.format("Rendering %s %%", (int) (100.0 * current_number_of_lines / ajob.getMaxOutputNbLines())));
 		}
@@ -873,11 +853,11 @@ public class Client {
 		}
 	}
 	
-	protected void updateRenderingMemoryPeak(String line, Job ajob) {
+	void updateRenderingMemoryPeak(String line, Job ajob) {
 		String[] elements = line.toLowerCase().split("(peak)");
 		
 		for (String element : elements) {
-			if (element.isEmpty() == false && (element.charAt(0) == ' ' || element.charAt(0) == ':')) {
+			if (!element.isEmpty() && (element.charAt(0) == ' ' || element.charAt(0) == ':')) {
 				int end = element.indexOf(element.charAt(0) == ' ' ? ')' : '|');
 				if (end > 0) {
 					long mem = Utils.parseNumber(element.substring(1, end).trim());

@@ -48,10 +48,10 @@ public class Windows extends OS {
 			String[] identifier = java.lang.System.getenv("PROCESSOR_IDENTIFIER").split(" ");
 			for (int i = 0; i < (identifier.length - 1); i++) {
 				if (identifier[i].equals("Family")) {
-					ret.setFamily(new String(identifier[i + 1]));
+					ret.setFamily(identifier[i + 1]);
 				}
 				if (identifier[i].equals("Model")) {
-					ret.setModel(new String(identifier[i + 1]));
+					ret.setModel(identifier[i + 1]);
 				}
 			}
 		}
@@ -109,9 +109,8 @@ public class Windows extends OS {
 	@Override
 	public Process exec(String[] command) throws IOException {
 		// disable a popup because the renderer might crash (seg fault)
-		Kernel32Lib kernel32lib = null;
 		try {
-			kernel32lib = (Kernel32Lib) Native.loadLibrary(Kernel32Lib.path, Kernel32Lib.class);
+			Kernel32Lib kernel32lib = (Kernel32Lib) Native.loadLibrary(Kernel32Lib.path, Kernel32Lib.class);
 			kernel32lib.SetErrorMode(Kernel32Lib.SEM_NOGPFAULTERRORBOX);
 		}
 		catch (java.lang.UnsatisfiedLinkError e) {

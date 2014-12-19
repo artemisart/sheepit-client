@@ -41,9 +41,9 @@ public class WinProcess {
 	
 	private WinNT.HANDLE handle;
 	private int pid;
-	Kernel32Lib kernel32lib;
+	private Kernel32Lib kernel32lib;
 	
-	public WinProcess() {
+	private WinProcess() {
 		this.handle = null;
 		this.pid = -1;
 		this.kernel32lib = null;
@@ -79,7 +79,7 @@ public class WinProcess {
 		}
 	}
 	
-	public WinProcess(int pid_) throws IOException {
+	private WinProcess(int pid_) throws IOException {
 		this();
 		this.handle = Kernel32.INSTANCE.OpenProcess(0x0400 | // PROCESS_QUERY_INFORMATION
 													0x0800 | // PROCESS_SUSPEND_RESUME
@@ -103,17 +103,12 @@ public class WinProcess {
 	}
 	
 	public boolean kill() {
-		try {
-			List<WinProcess> children = this.getChildren();
-			this.terminate();
-			for (WinProcess child : children) {
-				child.kill();
-			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		List<WinProcess> children = this.getChildren();
+		this.terminate();
+		for (WinProcess child : children) {
+            child.kill();
+        }
+
 		return false;
 	}
 	
@@ -126,8 +121,8 @@ public class WinProcess {
 		Kernel32.INSTANCE.CloseHandle(this.handle); // we are sure that the parent Process object is dead
 	}
 	
-	private List<WinProcess> getChildren() throws IOException {
-		ArrayList<WinProcess> result = new ArrayList<WinProcess>();
+	private List<WinProcess> getChildren() {
+		ArrayList<WinProcess> result = new ArrayList<>();
 		
 		WinNT.HANDLE hSnap = this.kernel32lib.CreateToolhelp32Snapshot(Kernel32Lib.TH32CS_SNAPPROCESS, new DWORD(0));
 		Kernel32Lib.PROCESSENTRY32.ByReference ent = new Kernel32Lib.PROCESSENTRY32.ByReference();

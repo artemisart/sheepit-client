@@ -24,7 +24,7 @@ import com.sheepit.client.Log;
 
 public class GuiText implements Gui {
 	private int framesRendered;
-	private Log log;
+	private final Log log;
 	
 	public GuiText() {
 		this.framesRendered = 0;

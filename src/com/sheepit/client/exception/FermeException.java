@@ -20,7 +20,7 @@
 package com.sheepit.client.exception;
 
 public class FermeException extends Exception {
-	public FermeException() {
+	FermeException() {
 		super();
 	}
 	

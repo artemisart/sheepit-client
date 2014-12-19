@@ -33,7 +33,7 @@ package com.sheepit.client.hardware.gpu;
  * <br />
  * Most comments are taken from the CUDA reference manual.
  */
-public class CUresult {
+class CUresult {
 	/**
 	 * The API call returned with no errors. In the case of query calls, this
 	 * can also mean that the operation being queried is complete (see
@@ -45,30 +45,30 @@ public class CUresult {
 	 * This indicates that one or more of the parameters passed to the API call
 	 * is not within an acceptable range of values.
 	 */
-	public static final int CUDA_ERROR_INVALID_VALUE = 1;
+	private static final int CUDA_ERROR_INVALID_VALUE = 1;
 	
 	/**
 	 * The API call failed because it was unable to allocate enough memory to
 	 * perform the requested operation.
 	 */
-	public static final int CUDA_ERROR_OUT_OF_MEMORY = 2;
+	private static final int CUDA_ERROR_OUT_OF_MEMORY = 2;
 	
 	/**
 	 * This indicates that the CUDA driver has not been initialized with
 	 * ::cuInit() or that initialization has failed.
 	 */
-	public static final int CUDA_ERROR_NOT_INITIALIZED = 3;
+	private static final int CUDA_ERROR_NOT_INITIALIZED = 3;
 	
 	/**
 	 * This indicates that the CUDA driver is in the process of shutting down.
 	 */
-	public static final int CUDA_ERROR_DEINITIALIZED = 4;
+	private static final int CUDA_ERROR_DEINITIALIZED = 4;
 	
 	/**
 	 * This indicates profiling APIs are called while application is running
 	 * in visual profiler mode. 
 	 */
-	public static final int CUDA_ERROR_PROFILER_DISABLED = 5;
+	private static final int CUDA_ERROR_PROFILER_DISABLED = 5;
 	
 	/**
 	 * This indicates profiling has not been initialized for this context. 
@@ -78,7 +78,7 @@ public class CUresult {
 	 * profiling via ::cuProfilerStart or ::cuProfilerStop without 
 	 * initialization. 
 	 */
-	public static final int CUDA_ERROR_PROFILER_NOT_INITIALIZED = 6;
+	private static final int CUDA_ERROR_PROFILER_NOT_INITIALIZED = 6;
 	
 	/**
 	 * This indicates profiler has already been started and probably
@@ -87,7 +87,7 @@ public class CUresult {
 	 * It is no longer an error to call cuProfilerStart() when 
 	 * profiling is already enabled.
 	 */
-	public static final int CUDA_ERROR_PROFILER_ALREADY_STARTED = 7;
+	private static final int CUDA_ERROR_PROFILER_ALREADY_STARTED = 7;
 	
 	/**
 	 * This indicates profiler has already been stopped and probably
@@ -96,7 +96,7 @@ public class CUresult {
 	 * It is no longer an error to call cuProfilerStop() when 
 	 * profiling is already disabled.
 	 */
-	public static final int CUDA_ERROR_PROFILER_ALREADY_STOPPED = 8;
+	private static final int CUDA_ERROR_PROFILER_ALREADY_STOPPED = 8;
 	
 	/**
 	 * This indicates that no CUDA-capable devices were detected by the installed
@@ -108,13 +108,13 @@ public class CUresult {
 	 * This indicates that the device ordinal supplied by the user does not
 	 * correspond to a valid CUDA device.
 	 */
-	public static final int CUDA_ERROR_INVALID_DEVICE = 101;
+	private static final int CUDA_ERROR_INVALID_DEVICE = 101;
 	
 	/**
 	 * This indicates that the device kernel image is invalid. This can also
 	 * indicate an invalid CUDA module.
 	 */
-	public static final int CUDA_ERROR_INVALID_IMAGE = 200;
+	private static final int CUDA_ERROR_INVALID_IMAGE = 200;
 	
 	/**
 	 * This most frequently indicates that there is no context bound to the
@@ -124,7 +124,7 @@ public class CUresult {
 	 * mixes different API versions (i.e. 3010 context with 3020 API calls).
 	 * See ::cuCtxGetApiVersion() for more details.
 	 */
-	public static final int CUDA_ERROR_INVALID_CONTEXT = 201;
+	private static final int CUDA_ERROR_INVALID_CONTEXT = 201;
 	
 	/**
 	 * This indicated that the context being supplied as a parameter to the
@@ -133,28 +133,28 @@ public class CUresult {
 	 * This error return is deprecated as of CUDA 3.2. It is no longer an
 	 * error to attempt to push the active context via ::cuCtxPushCurrent().
 	 */
-	public static final int CUDA_ERROR_CONTEXT_ALREADY_CURRENT = 202;
+	private static final int CUDA_ERROR_CONTEXT_ALREADY_CURRENT = 202;
 	
 	/**
 	 * This indicates that a map or register operation has failed.
 	 */
-	public static final int CUDA_ERROR_MAP_FAILED = 205;
+	private static final int CUDA_ERROR_MAP_FAILED = 205;
 	
 	/**
 	 * This indicates that an unmap or unregister operation has failed.
 	 */
-	public static final int CUDA_ERROR_UNMAP_FAILED = 206;
+	private static final int CUDA_ERROR_UNMAP_FAILED = 206;
 	
 	/**
 	 * This indicates that the specified array is currently mapped and thus
 	 * cannot be destroyed.
 	 */
-	public static final int CUDA_ERROR_ARRAY_IS_MAPPED = 207;
+	private static final int CUDA_ERROR_ARRAY_IS_MAPPED = 207;
 	
 	/**
 	 * This indicates that the resource is already mapped.
 	 */
-	public static final int CUDA_ERROR_ALREADY_MAPPED = 208;
+	private static final int CUDA_ERROR_ALREADY_MAPPED = 208;
 	
 	/**
 	 * This indicates that there is no kernel image available that is suitable
@@ -162,91 +162,91 @@ public class CUresult {
 	 * options for a particular CUDA source file that do not include the
 	 * corresponding device configuration.
 	 */
-	public static final int CUDA_ERROR_NO_BINARY_FOR_GPU = 209;
+	private static final int CUDA_ERROR_NO_BINARY_FOR_GPU = 209;
 	
 	/**
 	 * This indicates that a resource has already been acquired.
 	 */
-	public static final int CUDA_ERROR_ALREADY_ACQUIRED = 210;
+	private static final int CUDA_ERROR_ALREADY_ACQUIRED = 210;
 	
 	/**
 	 * This indicates that a resource is not mapped.
 	 */
-	public static final int CUDA_ERROR_NOT_MAPPED = 211;
+	private static final int CUDA_ERROR_NOT_MAPPED = 211;
 	
 	/**
 	 * This indicates that a mapped resource is not available for access as an
 	 * array.
 	 */
-	public static final int CUDA_ERROR_NOT_MAPPED_AS_ARRAY = 212;
+	private static final int CUDA_ERROR_NOT_MAPPED_AS_ARRAY = 212;
 	
 	/**
 	 * This indicates that a mapped resource is not available for access as a
 	 * pointer.
 	 */
-	public static final int CUDA_ERROR_NOT_MAPPED_AS_POINTER = 213;
+	private static final int CUDA_ERROR_NOT_MAPPED_AS_POINTER = 213;
 	
 	/**
 	 * This indicates that an uncorrectable ECC error was detected during
 	 * execution.
 	 */
-	public static final int CUDA_ERROR_ECC_UNCORRECTABLE = 214;
+	private static final int CUDA_ERROR_ECC_UNCORRECTABLE = 214;
 	
 	/**
 	 * This indicates that the ::CUlimit passed to the API call is not
 	 * supported by the active device.
 	 */
-	public static final int CUDA_ERROR_UNSUPPORTED_LIMIT = 215;
+	private static final int CUDA_ERROR_UNSUPPORTED_LIMIT = 215;
 	
 	/**
 	 * This indicates that the ::CUcontext passed to the API call can
 	 * only be bound to a single CPU thread at a time but is already 
 	 * bound to a CPU thread.
 	 */
-	public static final int CUDA_ERROR_CONTEXT_ALREADY_IN_USE = 216;
+	private static final int CUDA_ERROR_CONTEXT_ALREADY_IN_USE = 216;
 	
 	/**
 	 * This indicates that peer access is not supported across the given
 	 * devices.
 	 */
-	public static final int CUDA_ERROR_PEER_ACCESS_UNSUPPORTED = 217;
+	private static final int CUDA_ERROR_PEER_ACCESS_UNSUPPORTED = 217;
 	
 	/**
 	 * This indicates that the device kernel source is invalid.
 	 */
-	public static final int CUDA_ERROR_INVALID_SOURCE = 300;
+	private static final int CUDA_ERROR_INVALID_SOURCE = 300;
 	
 	/**
 	 * This indicates that the file specified was not found.
 	 */
-	public static final int CUDA_ERROR_FILE_NOT_FOUND = 301;
+	private static final int CUDA_ERROR_FILE_NOT_FOUND = 301;
 	
 	/**
 	 * This indicates that a link to a shared object failed to resolve.
 	 */
-	public static final int CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND = 302;
+	private static final int CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND = 302;
 	
 	/**
 	 * This indicates that initialization of a shared object failed.
 	 */
-	public static final int CUDA_ERROR_SHARED_OBJECT_INIT_FAILED = 303;
+	private static final int CUDA_ERROR_SHARED_OBJECT_INIT_FAILED = 303;
 	
 	/**
 	 * This indicates that an OS call failed.
 	 */
-	public static final int CUDA_ERROR_OPERATING_SYSTEM = 304;
+	private static final int CUDA_ERROR_OPERATING_SYSTEM = 304;
 	
 	/**
 	 * This indicates that a resource handle passed to the API call was not
 	 * valid. Resource handles are opaque types like ::CUstream and ::CUevent.
 	 */
-	public static final int CUDA_ERROR_INVALID_HANDLE = 400;
+	private static final int CUDA_ERROR_INVALID_HANDLE = 400;
 	
 	/**
 	 * This indicates that a named symbol was not found. Examples of symbols
 	 * are global/constant variable names, texture names, and surface names.
 	 */
-	public static final int CUDA_ERROR_NOT_FOUND = 500;
+	private static final int CUDA_ERROR_NOT_FOUND = 500;
 	
 	/**
 	 * This indicates that asynchronous operations issued previously have not
@@ -254,7 +254,7 @@ public class CUresult {
 	 * differently than ::CUDA_SUCCESS (which indicates completion). Calls that
 	 * may return this value include ::cuEventQuery() and ::cuStreamQuery().
 	 */
-	public static final int CUDA_ERROR_NOT_READY = 600;
+	private static final int CUDA_ERROR_NOT_READY = 600;
 	
 	/**
 	 * An exception occurred on the device while executing a kernel. Common
@@ -264,7 +264,7 @@ public class CUresult {
 	 * memory allocations from this context are invalid and must be
 	 * reconstructed if the program is to continue using CUDA.
 	 */
-	public static final int CUDA_ERROR_LAUNCH_FAILED = 700;
+	private static final int CUDA_ERROR_LAUNCH_FAILED = 700;
 	
 	/**
 	 * This indicates that a launch did not occur because it did not have
@@ -275,7 +275,7 @@ public class CUresult {
 	 * when a 32-bit int is expected) is equivalent to passing too many
 	 * arguments and can also result in this error.
 	 */
-	public static final int CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES = 701;
+	private static final int CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES = 701;
 	
 	/**
 	 * This indicates that the device kernel took too long to execute. This can
@@ -286,20 +286,20 @@ public class CUresult {
 	 * this context are invalid and must be reconstructed if the program is to
 	 * continue using CUDA.
 	 */
-	public static final int CUDA_ERROR_LAUNCH_TIMEOUT = 702;
+	private static final int CUDA_ERROR_LAUNCH_TIMEOUT = 702;
 	
 	/**
 	 * This error indicates a kernel launch that uses an incompatible texturing
 	 * mode.
 	 */
-	public static final int CUDA_ERROR_LAUNCH_INCOMPATIBLE_TEXTURING = 703;
+	private static final int CUDA_ERROR_LAUNCH_INCOMPATIBLE_TEXTURING = 703;
 	
 	/**
 	 * This error indicates that a call to ::cuCtxEnablePeerAccess() is
 	 * trying to re-enable peer access to a context which has already
 	 * had peer access to it enabled.
 	 */
-	public static final int CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED = 704;
+	private static final int CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED = 704;
 	
 	/**
 	 * This error indicates that a call to ::cuMemPeerRegister is trying to
@@ -308,7 +308,7 @@ public class CUresult {
 	 * ::cuCtxDisablePeerAccess() is trying to disable peer access
 	 * which has not been enabled yet.
 	 */
-	public static final int CUDA_ERROR_PEER_ACCESS_NOT_ENABLED = 705;
+	private static final int CUDA_ERROR_PEER_ACCESS_NOT_ENABLED = 705;
 	
 	/**
 	 * This error indicates that a call to ::cuMemPeerRegister is trying to
@@ -316,7 +316,7 @@ public class CUresult {
 	 * @deprecated This value has been added in CUDA 4.0 RC,
 	 * and removed in CUDA 4.0 RC2
 	 */
-	public static final int CUDA_ERROR_PEER_MEMORY_ALREADY_REGISTERED = 706;
+	private static final int CUDA_ERROR_PEER_MEMORY_ALREADY_REGISTERED = 706;
 	
 	/**
 	 * This error indicates that a call to ::cuMemPeerUnregister is trying to
@@ -324,21 +324,21 @@ public class CUresult {
 	 * @deprecated This value has been added in CUDA 4.0 RC,
 	 * and removed in CUDA 4.0 RC2
 	 */
-	public static final int CUDA_ERROR_PEER_MEMORY_NOT_REGISTERED = 707;
+	private static final int CUDA_ERROR_PEER_MEMORY_NOT_REGISTERED = 707;
 	
 	/**
 	 * This error indicates that ::cuCtxCreate was called with the flag
 	 * ::CU_CTX_PRIMARY on a device which already has initialized its
 	 * primary context.
 	 */
-	public static final int CUDA_ERROR_PRIMARY_CONTEXT_ACTIVE = 708;
+	private static final int CUDA_ERROR_PRIMARY_CONTEXT_ACTIVE = 708;
 	
 	/**
 	 * This error indicates that the context current to the calling thread
 	 * has been destroyed using ::cuCtxDestroy, or is a primary context which
 	 * has not yet been initialized.
 	 */
-	public static final int CUDA_ERROR_CONTEXT_IS_DESTROYED = 709;
+	private static final int CUDA_ERROR_CONTEXT_IS_DESTROYED = 709;
 	
 	/**
 	 * A device-side assert triggered during kernel execution. The context
@@ -346,42 +346,42 @@ public class CUresult {
 	 * memory allocations from this context are invalid and must be 
 	 * reconstructed if the program is to continue using CUDA.
 	 */
-	public static final int CUDA_ERROR_ASSERT = 710;
+	private static final int CUDA_ERROR_ASSERT = 710;
 	
 	/**
 	 * This error indicates that the hardware resources required to enable
 	 * peer access have been exhausted for one or more of the devices 
 	 * passed to ::cuCtxEnablePeerAccess().
 	 */
-	public static final int CUDA_ERROR_TOO_MANY_PEERS = 711;
+	private static final int CUDA_ERROR_TOO_MANY_PEERS = 711;
 	
 	/**
 	 * This error indicates that the memory range passed to ::cuMemHostRegister()
 	 * has already been registered.
 	 */
-	public static final int CUDA_ERROR_HOST_MEMORY_ALREADY_REGISTERED = 712;
+	private static final int CUDA_ERROR_HOST_MEMORY_ALREADY_REGISTERED = 712;
 	
 	/**
 	 * This error indicates that the pointer passed to ::cuMemHostUnregister()
 	 * does not correspond to any currently registered memory region.
 	 */
-	public static final int CUDA_ERROR_HOST_MEMORY_NOT_REGISTERED = 713;
+	private static final int CUDA_ERROR_HOST_MEMORY_NOT_REGISTERED = 713;
 	
 	/**
 	 * This error indicates that the attempted operation is not permitted.
 	 */
-	public static final int CUDA_ERROR_NOT_PERMITTED = 800;
+	private static final int CUDA_ERROR_NOT_PERMITTED = 800;
 	
 	/**
 	 * This error indicates that the attempted operation is not supported
 	 * on the current system or device.
 	 */
-	public static final int CUDA_ERROR_NOT_SUPPORTED = 801;
+	private static final int CUDA_ERROR_NOT_SUPPORTED = 801;
 	
 	/**
 	 * This indicates that an unknown internal error has occurred.
 	 */
-	public static final int CUDA_ERROR_UNKNOWN = 999;
+	private static final int CUDA_ERROR_UNKNOWN = 999;
 	
 	/**
 	 * Returns the String identifying the given CUresult

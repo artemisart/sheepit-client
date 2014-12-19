@@ -24,27 +24,27 @@ import java.io.File;
 import com.sheepit.client.os.OS;
 
 public class Job {
-	private String numFrame;
-	private String sceneMD5;
-	private String rendererMD5;
-	private String id;
-	private String revision;
+	private final String numFrame;
+	private final String sceneMD5;
+	private final String rendererMD5;
+	private final String id;
+	private final String revision;
 	private String pictureFilename;
-	private String path; // path inside of the archive
+	private final String path; // path inside of the archive
 	private int renderDuration; // in second
 	private long memoryUsed; // in kB
-	private String rendererCommand;
-	private String script;
+	private final String rendererCommand;
+	private final String script;
 	private int maxOutputNbLines;
-	private boolean useGPU;
-	private String extras;
-	private String updateRenderingStatusMethod;
-	private boolean synchronousUpload;
+	private final boolean useGPU;
+	private final String extras;
+	private final String updateRenderingStatusMethod;
+	private final boolean synchronousUpload;
 	
 	private Process process;
 	private boolean askForRendererKill;
 	
-	private Configuration config;
+	private final Configuration config;
 	
 	public Job(Configuration config_, String id_, String frame_, String revision_, String path_, boolean use_gpu, String command_, String script_, String sceneMd5_, String rendererMd5_, String extras_, boolean synchronous_upload_) {
 		config = config_;

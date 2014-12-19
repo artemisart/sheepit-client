@@ -78,13 +78,13 @@ import com.sheepit.client.exception.FermeExceptionNoSession;
 import com.sheepit.client.exception.FermeExceptionSessionDisabled;
 import com.sheepit.client.os.OS;
 
-public class Server extends Thread implements HostnameVerifier, X509TrustManager {
-	private String base_url;
-	private Configuration user_config;
-	private Client client;
-	private ArrayList<String> cookies;
-	private HashMap<String, String> pages;
-	private Log log;
+class Server extends Thread implements HostnameVerifier, X509TrustManager {
+	private final String base_url;
+	private final Configuration user_config;
+	private final Client client;
+	private final ArrayList<String> cookies;
+	private final HashMap<String, String> pages;
+	private final Log log;
 	private long lastRequestTime;
 	private int keepmealive_duration; // time in ms
 	
@@ -93,8 +93,8 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		this.base_url = url_;
 		this.user_config = user_config_;
 		this.client = client_;
-		this.pages = new HashMap<String, String>();
-		this.cookies = new ArrayList<String>();
+		this.pages = new HashMap<>();
+		this.cookies = new ArrayList<>();
 		this.log = Log.getInstance(this.user_config);
 		this.lastRequestTime = 0;
 		this.keepmealive_duration = 15 * 60 * 1000; // default 15min
@@ -105,7 +105,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		this.stayAlive();
 	}
 	
-	public void stayAlive() {
+	void stayAlive() {
 		while (true) {
 			long current_time = new Date().getTime();
 			if ((current_time - this.lastRequestTime) > this.keepmealive_duration) {
@@ -113,7 +113,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 					String args = "";
 					if (this.client != null && this.client.getRenderingJob() != null) {
 						args = "?frame=" + this.client.getRenderingJob().getFrameNumber() + "&job=" + this.client.getRenderingJob().getId();
-						if (this.client.getRenderingJob().getExtras() != null && this.client.getRenderingJob().getExtras().length() > 0) {
+						if (this.client.getRenderingJob().getExtras() != null && !this.client.getRenderingJob().getExtras().isEmpty()) {
 							args += "&extras=" + this.client.getRenderingJob().getExtras();
 						}
 					}
@@ -187,7 +187,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			
 			if (r == HttpURLConnection.HTTP_OK && contentType.startsWith("text/xml")) {
 				DataInputStream in = new DataInputStream(connection.getInputStream());
-				Document document = null;
+				Document document;
 				
 				try {
 					document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
@@ -209,16 +209,14 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				if (ret != ServerCode.OK) {
 					return Error.ServerCodeToType(ret);
 				}
-				
-				Element config_node = null;
-				NodeList ns = null;
-				ns = document.getElementsByTagName("config");
+
+				NodeList ns = document.getElementsByTagName("config");
 				if (ns.getLength() == 0) {
 					this.log.error("getConfiguration error: failed to parse XML, no node 'config_serveur'");
 					return Error.Type.WRONG_CONFIGURATION;
 				}
-				config_node = (Element) ns.item(0);
-				
+				Element config_node = (Element) ns.item(0);
+
 				ns = config_node.getElementsByTagName("request");
 				if (ns.getLength() == 0) {
 					this.log.error("getConfiguration error: failed to parse XML, node 'config' have no child node 'request'");
@@ -264,10 +262,9 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		return Error.Type.OK;
 	}
 	
-	public Job requestJob() throws FermeException, FermeExceptionNoRightToRender, FermeExceptionNoSession, FermeExceptionSessionDisabled {
+	public Job requestJob() throws FermeException {
 		this.log.debug("Server::requestJob");
-		String url_contents = "";
-		
+
 		HttpURLConnection connection = null;
 		try {
 			String url = String.format("%s?computemethod=%s", this.getPage("request-job"), this.user_config.computeMethodToInt());
@@ -280,15 +277,15 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				}
 				url += "&gpu_model=" + gpu_model + "&gpu_ram=" + this.user_config.getGPUDevice().getMemory();
 			}
-			
+
 			connection = this.HTTPRequest(url, this.generateXMLForMD5cache());
-			
+
 			int r = connection.getResponseCode();
 			String contentType = connection.getContentType();
-			
+
 			if (r == HttpURLConnection.HTTP_OK && contentType.startsWith("text/xml")) {
 				DataInputStream in = new DataInputStream(connection.getInputStream());
-				Document document = null;
+				Document document;
 				try {
 					document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 				}
@@ -320,18 +317,15 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 					this.log.error("Server::requestJob: Utils.statusIsOK(document, 'jobrequest') -> ret " + ret);
 					throw new FermeException("error requestJob: status is not ok (it's " + ret + ")");
 				}
-				
+
 				handleFileMD5DeleteDocument(document, "jobrequest");
-				
-				Element a_node = null;
-				NodeList ns = null;
-				
-				ns = document.getElementsByTagName("frames");
+
+				NodeList ns = document.getElementsByTagName("frames");
 				if (ns.getLength() == 0) {
 					throw new FermeException("error requestJob: parseXML failed, no 'frame' node");
 				}
-				a_node = (Element) ns.item(0);
-				
+				Element a_node = (Element) ns.item(0);
+
 				int remaining_frames = -1;
 				if (a_node.hasAttribute("remaining")) {
 					remaining_frames = Integer.parseInt(a_node.getAttribute("remaining"));
@@ -354,7 +348,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 					ns = job_node.getElementsByTagName("script");
 					if (ns.getLength() != 0) {
 						Element a_node3 = (Element) ns.item(0);
-						script += new String(a_node3.getTextContent());
+						script += a_node3.getTextContent();
 					}
 				}
 				catch (Exception e) {
@@ -365,13 +359,13 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				String[] renderer_node_require_attribute = { "md5", "commandline" };
 				
 				for (String e : job_node_require_attribute) {
-					if (job_node.hasAttribute(e) == false) {
+					if (!job_node.hasAttribute(e)) {
 						throw new FermeException("error requestJob: parseXML failed, job_node have to attribute '" + e + "'");
 					}
 				}
 				
 				for (String e : renderer_node_require_attribute) {
-					if (renderer_node.hasAttribute(e) == false) {
+					if (!renderer_node.hasAttribute(e)) {
 						throw new FermeException("error requestJob: parseXML failed, renderer_node have to attribute '" + e + "'");
 					}
 				}
@@ -407,6 +401,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				return a_job;
 			}
 			else {
+				String url_contents = "";
 				System.out.println("Server::requestJob url " + url_contents + " r " + r + " contentType " + contentType);
 				InputStream in = connection.getInputStream();
 				String line;
@@ -444,12 +439,11 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		return this.HTTPRequest(url_, null);
 	}
 	
-	public HttpURLConnection HTTPRequest(String url_, String data_) throws IOException {
+	HttpURLConnection HTTPRequest(String url_, String data_) throws IOException {
 		this.log.debug("Server::HTTPRequest url(" + url_ + ")");
-		HttpURLConnection connection = null;
 		URL url = new URL(url_);
-		
-		connection = (HttpURLConnection) url.openConnection();
+
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
 		connection.setRequestMethod("GET");
@@ -459,8 +453,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		
 		if (url_.startsWith("https://")) {
 			try {
-				SSLContext sc;
-				sc = SSLContext.getInstance("SSL");
+				SSLContext sc = SSLContext.getInstance("SSL");
 				sc.init(null, new TrustManager[] { this }, null);
 				SSLSocketFactory factory = sc.getSocketFactory();
 				((HttpsURLConnection) connection).setSSLSocketFactory(factory);
@@ -485,7 +478,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			out.close();
 		}
 		
-		String headerName = null;
+		String headerName;
 		for (int i = 1; (headerName = connection.getHeaderFieldKey(i)) != null; i++) {
 			if (headerName.equals("Set-Cookie")) {
 				String cookie = connection.getHeaderField(i);
@@ -547,26 +540,13 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 	public ServerCode HTTPSendFile(String surl, String file1) {
 		this.log.debug("Server::HTTPSendFile(" + surl + "," + file1 + ")");
 		
-		HttpURLConnection conn = null;
-		DataOutputStream dos = null;
-		BufferedReader inStream = null;
-		
-		String exsistingFileName = file1;
-		File fFile2Snd = new File(exsistingFileName);
-		
-		String lineEnd = "\r\n";
-		String twoHyphens = "--";
-		String boundary = "***232404jkg4220957934FW**";
-		
-		int bytesRead, bytesAvailable, bufferSize;
-		byte[] buffer;
-		int maxBufferSize = 1 * 1024 * 1024;
-		
-		String urlString = surl;
-		
+		HttpURLConnection conn;
+
+		File fFile2Snd = new File(file1);
+
 		try {
-			FileInputStream fileInputStream = new FileInputStream(new File(exsistingFileName));
-			URL url = new URL(urlString);
+			FileInputStream fileInputStream = new FileInputStream(new File(file1));
+			URL url = new URL(surl);
 			
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setDoInput(true);
@@ -578,12 +558,12 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Connection", "Keep-Alive");
+			String boundary = "***232404jkg4220957934FW**";
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 			
-			if (urlString.startsWith("https://")) {
+			if (surl.startsWith("https://")) {
 				try {
-					SSLContext sc;
-					sc = SSLContext.getInstance("SSL");
+					SSLContext sc = SSLContext.getInstance("SSL");
 					sc.init(null, new TrustManager[] { this }, null);
 					SSLSocketFactory factory = sc.getSocketFactory();
 					((HttpsURLConnection) conn).setSSLSocketFactory(factory);
@@ -610,18 +590,21 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 					return ServerCode.UNKNOWN;
 				}
 			}
-			
-			dos = new DataOutputStream(conn.getOutputStream());
+
+			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+			String twoHyphens = "--";
+			String lineEnd = "\r\n";
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			dos.writeBytes("Content-Disposition: form-data; name=\"file\";" + " filename=\"" + fFile2Snd.getName() + "\"" + lineEnd);
 			dos.writeBytes(lineEnd);
-			
-			bytesAvailable = fileInputStream.available();
-			bufferSize = Math.min(bytesAvailable, maxBufferSize);
-			buffer = new byte[bufferSize];
-			
-			bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-			
+
+			int bytesAvailable = fileInputStream.available();
+			int maxBufferSize = 1024 * 1024;
+			int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+			byte[] buffer = new byte[bufferSize];
+
+			int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+
 			while (bytesRead > 0) {
 				dos.write(buffer, 0, bufferSize);
 				bytesAvailable = fileInputStream.available();
@@ -667,7 +650,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				e1.printStackTrace();
 				return ServerCode.UNKNOWN;
 			}
-			Document document = null;
+			Document document;
 			try {
 				document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 			}
@@ -695,8 +678,8 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		}
 		else {
 			try {
-				inStream = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-				
+				BufferedReader inStream = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
 				String str;
 				while ((str = inStream.readLine()) != null) {
 					System.out.println(str);
@@ -726,7 +709,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				rootElement.appendChild(node_file);
 				try {
 					String extension = local_file.getName().substring(local_file.getName().lastIndexOf('.')).toLowerCase();
-					String name = local_file.getName().substring(0, local_file.getName().length() - 1 * extension.length());
+					String name = local_file.getName().substring(0, local_file.getName().length() - extension.length());
 					if (extension.equals(".zip")) {
 						node_file.setAttribute("md5", name);
 					}

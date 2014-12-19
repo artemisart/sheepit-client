@@ -57,21 +57,21 @@ public class Linux extends OS {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				if (line.startsWith("model name")) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						ret.setName(buf[1].trim());
 					}
 				}
 				
 				if (line.startsWith("cpu family")) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						ret.setFamily(buf[1].trim());
 					}
 				}
 				
-				if (line.startsWith("model") && line.startsWith("model name") == false) {
-					String buf[] = line.split(":");
+				if (line.startsWith("model") && !line.startsWith("model name")) {
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						ret.setModel(buf[1].trim());
 					}
@@ -90,25 +90,22 @@ public class Linux extends OS {
 	
 	@Override
 	public int getMemory() {
-		try {
-			String filePath = "/proc/meminfo";
-			Scanner scanner = new Scanner(new File(filePath));
-			
+		String filePath = "/proc/meminfo";
+		try (Scanner scanner = new Scanner(new File(filePath))) {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				
 				if (line.startsWith("MemTotal")) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						Integer buf2 = new Integer(buf[1].trim().split(" ")[0]);
 						return (((buf2 / 262144) + 1) * 262144); // 256*1024 = 262144
 					}
 				}
 			}
-			scanner.close();
 		}
 		catch (java.lang.NoClassDefFoundError e) {
-			System.err.println("Machine::type error " + e + " mostly because Scanner class was introducted by Java 5 and you are running are lower version");
+			System.err.println("Machine::type error " + e + " mostly because Scanner class was introduced by Java 5 and you are running are lower version");
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -127,24 +124,24 @@ public class Linux extends OS {
 		// the renderer have a lib directory so add to the LD_LIBRARY_PATH
 		// (even if we are not sure that it is the renderer who is launch
 		
-		Map<String, String> new_env = new HashMap<String, String>();
+		Map<String, String> new_env = new HashMap<>();
 		new_env.putAll(java.lang.System.getenv()); // clone the env
 		Boolean has_ld_library_path = new_env.containsKey("LD_LIBRARY_PATH");
 		
 		String lib_dir = (new File(command[0])).getParent() + File.separator + "lib";
 		String new_ld_library_path = "/lib:/lib64:/usr/lib:/usr/lib64:/lib/i386-linux-gnu:/lib/x86_64-linux-gnu:/usr/share/local" + ":" + lib_dir;
-		if (has_ld_library_path == false) {
-			new_env.put("LD_LIBRARY_PATH", new_ld_library_path);
+		if (has_ld_library_path) {
+			new_env.put("LD_LIBRARY_PATH", new_env.get("LD_LIBRARY_PATH") + ":" + new_ld_library_path);
 		}
 		else {
-			new_env.put("LD_LIBRARY_PATH", new_env.get("LD_LIBRARY_PATH") + ":" + new_ld_library_path);
+			new_env.put("LD_LIBRARY_PATH", new_ld_library_path);
 		}
 		
 		String[] actual_command = command;
 		if (this.hasNiceBinary == null) {
 			this.checkNiceAvailability();
 		}
-		if (this.hasNiceBinary.booleanValue()) {
+		if (this.hasNiceBinary) {
 			String[] low = { NICE_BINARY_PATH, "-n", "19" }; // launch the process in lowest priority
 			actual_command = Utils.concatAll(low, command);
 		}
@@ -159,7 +156,7 @@ public class Linux extends OS {
 		return builder.start();
 	}
 	
-	protected void checkNiceAvailability() {
+	void checkNiceAvailability() {
 		ProcessBuilder builder = new ProcessBuilder();
 		builder.command(NICE_BINARY_PATH);
 		builder.redirectErrorStream(true);

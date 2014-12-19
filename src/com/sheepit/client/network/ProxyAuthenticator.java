@@ -24,8 +24,8 @@ import java.net.PasswordAuthentication;
 
 public class ProxyAuthenticator extends Authenticator {
 	
-	private String user;
-	private String password;
+	private final String user;
+	private final String password;
 	
 	public ProxyAuthenticator(String user, String password) {
 		this.user = user;

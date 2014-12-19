@@ -19,22 +19,27 @@
 
 package com.sheepit.client.standalone;
 
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import static org.kohsuke.args4j.ExampleMode.REQUIRED;
-import org.kohsuke.args4j.Option;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.charset.StandardCharsets;
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+
 import com.sheepit.client.Client;
 import com.sheepit.client.Configuration;
 import com.sheepit.client.Configuration.ComputeType;
@@ -46,59 +51,59 @@ import com.sheepit.client.hardware.gpu.GPUDevice;
 import com.sheepit.client.network.ProxyAuthenticator;
 
 public class Worker {
-	@Option(name = "--server", aliases = { "-s" }, usage = "Render-farm server, default https://www.sheepit-renderfarm.com", metaVar = "URL")
+	@Option(name = "--server", aliases = "-s", usage = "Render-farm server, default https://www.sheepit-renderfarm.com", metaVar = "URL")
 	private String server = "https://www.sheepit-renderfarm.com";
-	
-	@Option(name = "--interactive", aliases = { "-i" }, usage = "Enable interactive prompt for login and password")
+
+	@Option(name = "--interactive", aliases = "-i", usage = "Enable interactive prompt for login and password")
 	private boolean interactive_prompt = false;
-	
-	@Option(name = "--login", aliases = { "-l" }, usage = "User's login", metaVar = "USERNAME")
+
+	@Option(name = "--login", aliases = "-l", usage = "User's login", metaVar = "USERNAME")
 	private String login = "";
-	
-	@Option(name = "--password", aliases = { "-p" }, usage = "User's password", metaVar = "PASSWORD")
+
+	@Option(name = "--password", aliases = "-p", usage = "User's password", metaVar = "PASSWORD")
 	private String password = "";
-	
-	@Option(name = "--cache-dir", aliases = { "-cd" }, usage = "Cache/Working directory. Caution, everything in it not related to the render-farm will be removed", metaVar = "/tmp/cache")
+
+	@Option(name = "--cache-dir", aliases = "-cd", usage = "Cache/Working directory. Caution, everything in it not related to the render-farm will be removed", metaVar = "/tmp/cache")
 	private String cache_dir = null;
-	
+
 	@Option(name = "-max-uploading-job", usage = "", metaVar = "1")
 	private int max_upload = -1;
-	
-	@Option(name = "--gpu", aliases = { "-g" }, usage = "CUDA name of the GPU used for the render, for example CUDA_0", metaVar = "CUDA_0")
+
+	@Option(name = "--gpu", aliases = "-g", usage = "CUDA name of the GPU used for the render, for example CUDA_0", metaVar = "CUDA_0")
 	private String gpu_device = null;
-	
-	@Option(name = "--compute-method", aliases = { "-m" }, usage = "CPU: only use cpu, GPU: only use gpu, CPU_GPU: can use cpu OR gpu, if -gpu is not set it will not use the gpu", metaVar = "CPU")
+
+	@Option(name = "--compute-method", aliases = "-m", usage = "CPU: only use cpu, GPU: only use gpu, CPU_GPU: can use cpu OR gpu, if -gpu is not set it will not use the gpu", metaVar = "CPU")
 	private String method = null;
-	
+
 	@Option(name = "--cores", usage = "Number of core/thread to use for the render", metaVar = "3")
 	private int nb_cores = -1;
-	
-	@Option(name = "--verbose", aliases = { "-log" }, usage = "Display log")
+
+	@Option(name = "--verbose", aliases = "-log", usage = "Display log")
 	private boolean print_log = false;
-	
+
 	@Option(name = "--request-time", usage = "H1:M1-H2:M2,H3:M3-H4:M4 Use the 24h format\nFor example to request job between 2am-8.30am and 5pm-11pm you should do --request-time 2:00-8:30,17:00-23:00\nCaution, it's the requesting job time to get a project not the working time", metaVar = "2:00-8:30,17:00-23:00")
 	private String request_time = null;
-	
+
 	@Option(name = "--proxy", usage = "URL of the proxy", metaVar = "http://login:passwd@host:port")
 	private String proxy = null;
-	
-	@Option(name = "--extras", aliases = { "-e" }, usage = "Extras data push on the authentication request")
+
+	@Option(name = "--extras", aliases = "-e", usage = "Extras data push on the authentication request")
 	private String extras = null;
-	
-	@Option(name = "--oneline", aliases = { "-ol" }, usage = "Use oneliner interface")
+
+	@Option(name = "--oneline", aliases = "-ol", usage = "Use oneline interface")
 	private boolean ui_oneline = false;
-	
-	@Option(name = "--version", aliases = { "-v" }, usage = "Display application version")
+
+	@Option(name = "--version", aliases = "-v", usage = "Display application version")
 	private boolean display_version = false;
-	
-	@Option(name = "--config", aliases = { "-c" }, usage = "Specify a config file with the options in it.\nSee README for syntax and samples.", metaVar = "sample.conf")
+
+	@Option(name = "--config", aliases = "-c", usage = "Specify a config file with the options in it.\nSee README for syntax and samples.", metaVar = "sample.conf")
 	private String config_file = null;
-	
+
 	public static void main(String[] args) {
 		new Worker().doMain(args);
 	}
-	
-	public void doMain(String[] args) {
+
+	void doMain(String[] args) {
 		CmdLineParser parser = new CmdLineParser(this);
 		if (args.length == 0) {
 			parser.printUsage(System.out);
@@ -116,14 +121,14 @@ public class Worker {
 			}
 			parser.parseArgument((sb.length() == 0 ? args : sb.toString().split("\\s+")));
 			if (interactive_prompt) {
-				if (login.length() == 0)
+				if (login.isEmpty())
 					login = System.console().readLine("Login:");
-				if (password.length() == 0)
+				if (password.isEmpty())
 					password = new String(System.console().readPassword("Password:"));
 			}
 		}
 		catch (IOException e) {
-			System.err.println(e);
+			e.printStackTrace();
 			return;
 		}
 		catch (CmdLineException e) {
@@ -134,16 +139,15 @@ public class Worker {
 			System.err.println("Example: java " + this.getClass().getName() + " " + parser.printExample(REQUIRED));
 			return;
 		}
-		
+
 		if (display_version) {
-			System.out.println("Version: " + new Configuration(null, "", "").getJarVersion());
+			System.out.println("Version: " + new Configuration("", "").getJarVersion());
 			return;
 		}
-		
-		ComputeType compute_method = ComputeType.CPU_ONLY;
-		Configuration config = new Configuration(null, login, password);
+
+		Configuration config = new Configuration(login, password);
 		config.setPrintLog(print_log);
-		
+
 		if (cache_dir != null) {
 			File a_dir = new File(cache_dir);
 			if (!a_dir.exists())
@@ -165,16 +169,8 @@ public class Worker {
 		}
 		
 		if (gpu_device != null) {
-			String cuda_str = "CUDA_";
-			if (gpu_device.startsWith(cuda_str) == false) {
-				System.err.println("CUDA_DEVICE should look like 'CUDA_X' where X is a number");
-				return;
-			}
-			try {
-				Integer.parseInt(gpu_device.substring(cuda_str.length()));
-			}
-			catch (NumberFormatException en) {
-				System.err.println("CUDA_DEVICE should look like 'CUDA_X' where X is a number");
+			if (!Pattern.matches("^CUDA_\\d+$", gpu_device)) {
+				System.err.println("CUDA_DEVICE must be 'CUDA_X' where X is a number");
 				return;
 			}
 			GPUDevice gpu = GPU.getGPUDevice(gpu_device);
@@ -187,32 +183,30 @@ public class Worker {
 		
 		if (request_time != null) {
 			String[] intervals = request_time.split(",");
-			if (intervals != null) {
-				config.requestTime = new LinkedList<Pair<Calendar, Calendar>>();
-				
-				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-				for (String interval : intervals) {
-					String[] times = interval.split("-");
-					if (times != null && times.length == 2) {
-						Calendar start = Calendar.getInstance();
-						Calendar end = Calendar.getInstance();
-						
-						try {
-							start.setTime(timeFormat.parse(times[0]));
-							end.setTime(timeFormat.parse(times[1]));
-						}
-						catch (ParseException e) {
-							System.err.println("Error: wrong format in request time");
-							System.exit(2);
-						}
-						
-						if (start.before(end)) {
-							config.requestTime.add(new Pair<Calendar, Calendar>(start, end));
-						}
-						else {
-							System.err.println("Error: wrong request time " + times[0] + " is after " + times[1]);
-							System.exit(2);
-						}
+			config.requestTime = new LinkedList<>();
+
+			SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+			for (String interval : intervals) {
+				String[] times = interval.split("-");
+				if (times.length == 2) {
+					Calendar start = Calendar.getInstance();
+					Calendar end = Calendar.getInstance();
+
+					try {
+						start.setTime(timeFormat.parse(times[0]));
+						end.setTime(timeFormat.parse(times[1]));
+					}
+					catch (ParseException e) {
+						System.err.println("Error: wrong format in request time");
+						System.exit(2);
+					}
+
+					if (start.before(end)) {
+						config.requestTime.add(new Pair<>(start, end));
+					}
+					else {
+						System.err.println("Error: wrong request time " + times[0] + " is after " + times[1]);
+						System.exit(2);
 					}
 				}
 			}
@@ -225,7 +219,8 @@ public class Worker {
 		else {
 			config.setUseNbCores(nb_cores);
 		}
-		
+
+		ComputeType compute_method = ComputeType.CPU_ONLY;
 		if (method != null) {
 			if (method.equalsIgnoreCase("cpu")) {
 				compute_method = ComputeType.CPU_ONLY;
@@ -242,12 +237,7 @@ public class Worker {
 			}
 		}
 		else {
-			if (config.getGPUDevice() == null) {
-				compute_method = ComputeType.CPU_ONLY;
-			}
-			else {
-				compute_method = ComputeType.GPU_ONLY;
-			}
+			compute_method = config.getGPUDevice() == null ? ComputeType.CPU_ONLY : ComputeType.GPU_ONLY;
 		}
 		
 		if (proxy != null) {
@@ -274,7 +264,7 @@ public class Worker {
 			}
 			catch (MalformedURLException e) {
 				System.err.println("Error: wrong url for proxy");
-				System.err.println(e);
+				e.printStackTrace();
 				System.exit(2);
 			}
 		}

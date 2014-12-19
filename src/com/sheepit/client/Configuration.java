@@ -36,14 +36,14 @@ import com.sheepit.client.os.OS;
 public class Configuration {
 	public enum ComputeType {
 		CPU_GPU, CPU_ONLY, GPU_ONLY
-	}; // accept job for ...
+	} // accept job for ...
 	
 	public File workingDirectory;
-	public File storageDirectory; // for permanent storage (binary archive)
-	public boolean userSpecifiedACacheDir;
-	public String static_exeDirName;
-	private String login;
-	private String password;
+	private File storageDirectory; // for permanent storage (binary archive)
+	private boolean userSpecifiedACacheDir;
+	private final String static_exeDirName;
+	private final String login;
+	private final String password;
 	private int maxUploadingJob;
 	private int nbCores;
 	private ComputeType computeMethod;
@@ -52,7 +52,7 @@ public class Configuration {
 	public List<Pair<Calendar, Calendar>> requestTime;
 	private String extras;
 	
-	public Configuration(File cache_dir_, String login_, String password_) {
+	public Configuration(String login_, String password_) {
 		this.login = login_;
 		this.password = password_;
 		this.static_exeDirName = "exe";
@@ -63,7 +63,7 @@ public class Configuration {
 		this.userSpecifiedACacheDir = false;
 		this.workingDirectory = null;
 		this.storageDirectory = null;
-		this.setCacheDir(cache_dir_);
+		this.setCacheDir(null);
 		this.printLog = false;
 		this.requestTime = null;
 		this.extras = "";
@@ -150,7 +150,7 @@ public class Configuration {
 	
 	public void setStorageDir(File dir) {
 		if (dir != null) {
-			if (dir.exists() == false) {
+			if (!dir.exists()) {
 				dir.mkdir();
 			}
 			this.storageDirectory = dir;
@@ -158,12 +158,7 @@ public class Configuration {
 	}
 	
 	public File getStorageDir() {
-		if (this.storageDirectory == null) {
-			return this.workingDirectory;
-		}
-		else {
-			return this.storageDirectory;
-		}
+		return this.storageDirectory == null ? this.workingDirectory : this.storageDirectory;
 	}
 	
 	public void setExtras(String str) {
@@ -179,27 +174,26 @@ public class Configuration {
 		this.cleanDirectory(this.storageDirectory);
 	}
 	
-	public boolean cleanDirectory(File dir) {
+	boolean cleanDirectory(File dir) {
 		if (dir == null) {
 			return false;
 		}
 		
 		File[] files = dir.listFiles();
 		if (files != null) {
-			for (int i = 0; i < files.length; i++) {
-				File file = files[i];
+			for (File file : files) {
 				if (file.isDirectory()) {
 					Utils.delete(file);
 				}
 				else {
 					try {
 						String extension = file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase();
-						String name = file.getName().substring(0, file.getName().length() - 1 * extension.length());
+						String name = file.getName().substring(0, file.getName().length() - extension.length());
 						if (extension.equals(".zip")) {
 							// check if the md5 of the file is ok
 							String md5_local = Utils.md5(file.getAbsolutePath());
 							
-							if (md5_local.equals(name) == false) {
+							if (!md5_local.equals(name)) {
 								System.err.println("cleanDirectory find an partial file => remove (" + file.getAbsolutePath() + ")");
 								file.delete();
 							}
@@ -220,7 +214,7 @@ public class Configuration {
 	}
 	
 	public void removeWorkingDirectory() {
-		if (this.userSpecifiedACacheDir == true) {
+		if (this.userSpecifiedACacheDir) {
 			this.cleanWorkingDirectory();
 		}
 		else {
@@ -229,8 +223,8 @@ public class Configuration {
 	}
 	
 	public List<File> getLocalCacheFiles() {
-		List<File> files_local = new LinkedList<File>();
-		List<File> files = new LinkedList<File>();
+		List<File> files_local = new LinkedList<>();
+		List<File> files = new LinkedList<>();
 		if (this.workingDirectory != null) {
 			files.addAll(Arrays.asList(this.workingDirectory.listFiles()));
 		}
@@ -242,7 +236,7 @@ public class Configuration {
 			if (file.isFile()) {
 				try {
 					String extension = file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase();
-					String name = file.getName().substring(0, file.getName().length() - 1 * extension.length());
+					String name = file.getName().substring(0, file.getName().length() - extension.length());
 					if (extension.equals(".zip")) {
 						// check if the md5 of the file is ok
 						String md5_local = Utils.md5(file.getAbsolutePath());
@@ -271,9 +265,7 @@ public class Configuration {
 		try {
 			InputStreamReader reader = new InputStreamReader(versionStream);
 			BufferedReader in = new BufferedReader(reader);
-			String version = in.readLine();
-			
-			return version;
+			return in.readLine();
 		}
 		catch (IOException ex) {
 			System.err.println("Configuration::getJarVersion error while reading manifest file (" + versionPath + "): " + ex.getMessage());

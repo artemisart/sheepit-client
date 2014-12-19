@@ -117,9 +117,9 @@ public class Utils {
 			e1.printStackTrace();
 			return "";
 		}
-		byte[] buffer = new byte[8192];
-		int read = 0;
 		try {
+			int read;
+			byte[] buffer = new byte[8192];
 			while ((read = is.read(buffer)) > 0) {
 				digest.update(buffer, 0, read);
 			}
@@ -155,8 +155,8 @@ public class Utils {
 		if (directory_.isDirectory()) {
 			File[] list = directory_.listFiles();
 			if (list != null) {
-				for (int i = 0; i < list.length; i++) {
-					double max1 = lastModificationTime(list[i]);
+				for (File aList : list) {
+					double max1 = lastModificationTime(aList);
 					if (max1 > max) {
 						max = max1;
 					}
@@ -193,7 +193,7 @@ public class Utils {
 			return;
 		}
 		if (file.isDirectory()) {
-			String files[] = file.list();
+			String[] files = file.list();
 			if (files != null) {
 				if (files.length != 0) {
 					for (String temp : files) {

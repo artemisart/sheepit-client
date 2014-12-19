@@ -24,17 +24,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class Log {
 	private static Log instance = null;
 	
-	private Map<Integer, ArrayList<String>> checkpoints = new HashMap<Integer, ArrayList<String>>();;
+	private final Map<Integer, ArrayList<String>> checkpoints = new HashMap<>();
 	private int lastCheckPoint;
-	private DateFormat dateFormat;
+	private final DateFormat dateFormat;
 	
-	private boolean printStdOut;
+	private final boolean printStdOut;
 	
 	private Log(boolean print_) {
 		this.printStdOut = print_;
@@ -56,12 +55,12 @@ public class Log {
 	}
 	
 	private void append(String level_, String msg_) {
-		if (msg_.equals("") == false) {
+		if (!msg_.isEmpty()) {
 			String line = this.dateFormat.format(new java.util.Date()) + " (" + level_ + ") " + msg_;
 			if (this.checkpoints.containsKey(this.lastCheckPoint)) {
 				this.checkpoints.get(this.lastCheckPoint).add(line);
 			}
-			if (this.printStdOut == true) {
+			if (this.printStdOut) {
 				System.out.println(line);
 			}
 		}
@@ -86,23 +85,18 @@ public class Log {
 		}
 	}
 	
-	public final synchronized static Log getInstance(Configuration config) {
+	public static synchronized Log getInstance(Configuration config) {
 		if (instance == null) {
-			boolean print = false;
-			if (config != null) {
-				print = config.getPrintLog();
-			}
-			instance = new Log(print);
+			instance = new Log(config != null && config.getPrintLog());
 		}
 		return instance;
 	}
 	
-	public final synchronized static void printCheckPoint(int point_) {
+	public static synchronized void printCheckPoint(int point_) {
 		Log log = Log.getInstance(null);
 		ArrayList<String> logs = log.getForCheckPoint(point_);
-		Iterator<String> it = logs.iterator();
-		while (it.hasNext()) {
-			System.out.println(it.next());
+		for (String log1 : logs) {
+			System.out.println(log1);
 		}
 	}
 }

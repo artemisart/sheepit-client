@@ -232,8 +232,8 @@ public class Client {
 				
 				ret = this.work(this.renderingJob);
 				if (ret == Error.Type.RENDERER_KILLED) {
-				    this.log.removeCheckPoint(step);
-				    continue;
+					this.log.removeCheckPoint(step);
+					continue;
 				}
 				
 				if (ret != Error.Type.OK) {
@@ -620,8 +620,8 @@ public class Client {
 			this.log.error("Client::runRenderer no picture file found (after finished render (filename_without_extension " + filename_without_extension + ")");
 			
 			if (ajob.getAskForRendererKill()) {
-			    this.log.debug("Client::runRenderer renderer didn't generate any frame but died due to a kill request");
-			    return Error.Type.RENDERER_KILLED;
+				this.log.debug("Client::runRenderer renderer didn't generate any frame but died due to a kill request");
+				return Error.Type.RENDERER_KILLED;
 			}
 			
 			String basename = "";

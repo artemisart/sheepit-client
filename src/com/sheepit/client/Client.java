@@ -98,7 +98,7 @@ public class Client {
 			return -3;
 		}
 		
-		if (!this.config.checkCPUisSUpported()) {
+		if (!this.config.checkCPUisSupported()) {
 			this.gui.error(Error.humanString(Error.Type.CPU_NOT_SUPPORTED));
 			return -4;
 		}
@@ -451,9 +451,9 @@ public class Client {
 			return Error.Type.DOWNLOAD_FILE;
 		}
 		
-		ret = this.prepareWorkeableDirectory(ajob); // decompress renderer and scene archives
+		ret = this.prepareWorkableDirectory(ajob); // decompress renderer and scene archives
 		if (ret != 0) {
-			this.log.error("Client::work problem with this.prepareWorkeableDirectory (ret " + ret + ")");
+			this.log.error("Client::work problem with this.prepareWorkableDirectory (ret " + ret + ")");
 			return Error.Type.CAN_NOT_CREATE_DIRECTORY;
 		}
 		
@@ -605,19 +605,19 @@ public class Client {
 		ajob.setProcess(null);
 		
 		// find the picture file
-		final String namefile_without_extension = ajob.getPrefixOutputImage() + ajob.getFrameNumber();
+		final String filename_without_extension = ajob.getPrefixOutputImage() + ajob.getFrameNumber();
 		
 		FilenameFilter textFilter = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
-				return name.startsWith(namefile_without_extension);
+				return name.startsWith(filename_without_extension);
 			}
 		};
 		
 		File[] files = this.config.workingDirectory.listFiles(textFilter);
 		
 		if (files.length == 0) {
-			this.log.error("Client::runRenderer no picture file found (after finished render (namefile_without_extension " + namefile_without_extension + ")");
+			this.log.error("Client::runRenderer no picture file found (after finished render (filename_without_extension " + filename_without_extension + ")");
 			
 			if (ajob.getAskForRendererKill()) {
 			    this.log.debug("Client::runRenderer renderer didn't generate any frame but died due to a kill request");
@@ -693,12 +693,12 @@ public class Client {
 		String real_url = String.format("%s?type=binary&job=%s", this.server.getPage("download-archive"), ajob.getId());
 		
 		// we have the MD5 of the renderer archive
-		String renderer_achive_local_path = ajob.getRendererArchivePath();
-		File renderer_achive_local_path_file = new File(renderer_achive_local_path);
+		String renderer_archive_local_path = ajob.getRendererArchivePath();
+		File renderer_archive_local_path_file = new File(renderer_archive_local_path);
 		
-		if (!renderer_achive_local_path_file.exists()) {
+		if (!renderer_archive_local_path_file.exists()) {
 			// we must download the archive
-			int ret = this.server.HTTPGetFile(real_url, renderer_achive_local_path, this.gui);
+			int ret = this.server.HTTPGetFile(real_url, renderer_archive_local_path, this.gui);
 			this.gui.status(""); // newline
 			if (ret != 0) {
 				this.gui.error("Client::downloadExecutable problem with Utils.DownloadFile returned " + ret);
@@ -706,7 +706,7 @@ public class Client {
 			}
 		}
 		
-		String md5_local = Utils.md5(renderer_achive_local_path);
+		String md5_local = Utils.md5(renderer_archive_local_path);
 		
 		if (!md5_local.equals(ajob.getRenderMd5())) {
 			this.log.error("Client::downloadExecutable mismatch on md5 local: '" + md5_local + "' server: '" + ajob.getRenderMd5() + "'");
@@ -727,7 +727,7 @@ public class Client {
 			// unzip the archive
 			int ret = Utils.unzipFileIntoDirectory(renderer_archive, renderer_path);
 			if (ret != 0) {
-				this.gui.error("Client::prepareWorkeableDirectory, error with Utils.unzipFileIntoDirectory of the renderer (returned " + ret + ")");
+				this.gui.error("Client::prepareWorkableDirectory, error with Utils.unzipFileIntoDirectory of the renderer (returned " + ret + ")");
 				return -1;
 			}
 		}
@@ -742,7 +742,7 @@ public class Client {
 			// unzip the archive
 			int ret = Utils.unzipFileIntoDirectory(scene_archive, scene_path);
 			if (ret != 0) {
-				this.gui.error("Client::prepareWorkeableDirectory, error with Utils.unzipFileIntoDirectory of the scene (returned " + ret + ")");
+				this.gui.error("Client::prepareWorkableDirectory, error with Utils.unzipFileIntoDirectory of the scene (returned " + ret + ")");
 				return -2;
 			}
 		}

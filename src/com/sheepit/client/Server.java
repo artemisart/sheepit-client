@@ -387,17 +387,8 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				System.out.println("");
 			}
 		}
-		catch (FermeExceptionNoRightToRender e) {
-			throw e;
-		}
-		catch (FermeExceptionNoSession e) {
-			throw e;
-		}
-		catch (FermeExceptionSessionDisabled e) {
-			throw e;
-		}
 		catch (FermeException e) {
-			throw new FermeException(e.getMessage());
+			throw e;
 		}
 		catch (Exception e) {
 			throw new FermeException("error requestJob: unknow exception " + e);

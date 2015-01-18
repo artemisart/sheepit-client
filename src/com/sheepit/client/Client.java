@@ -561,12 +561,7 @@ public class Client {
 			else if (command1[i].equals(".o")) {
 				command[index] = this.config.workingDirectory.getAbsolutePath() + File.separator + ajob.getPrefixOutputImage();
 			}
-			else if (command1[i].equals(".f")) {
-				command[index] = ajob.getFrameNumber();
-			}
-			else {
-				command[index] = command1[i];
-			}
+			else command[index] = command1[i].equals(".f") ? ajob.getFrameNumber() : command1[i];
 			index += 1;
 		}
 		

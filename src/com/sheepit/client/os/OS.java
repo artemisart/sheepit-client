@@ -63,11 +63,6 @@ public abstract class OS {
 		else if (os.indexOf("mac") >= 0) {
 			return new Mac();
 		}
-		else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0) {
-			return new Linux();
-		}
-		else {
-			return null;
-		}
+		else return os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 ? new Linux() : null;
 	}
 }

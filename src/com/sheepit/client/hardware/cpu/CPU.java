@@ -73,12 +73,7 @@ public class CPU {
 		if (arch.equals("i386") || arch.equals("i686") || arch.equals("x86")) {
 			this.arch = "32bit";
 		}
-		else if (arch.equals("amd64") || arch.equals("x86_64")) {
-			this.arch = "64bit";
-		}
-		else {
-			this.arch = null;
-		}
+		else this.arch = arch.equals("amd64") || arch.equals("x86_64") ? "64bit" : null;
 	}
 	
 	public boolean haveData() {

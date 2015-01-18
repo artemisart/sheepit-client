@@ -161,12 +161,7 @@ public class Configuration {
 	}
 	
 	public File getStorageDir() {
-		if (this.storageDirectory == null) {
-			return this.workingDirectory;
-		}
-		else {
-			return this.storageDirectory;
-		}
+		return this.storageDirectory == null ? this.workingDirectory : this.storageDirectory;
 	}
 	
 	public boolean getUserSpecifiedACacheDir() {

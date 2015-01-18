@@ -197,12 +197,7 @@ public class Worker {
 			}
 		}
 		else {
-			if (config.getGPUDevice() == null) {
-				compute_method = ComputeType.CPU_ONLY;
-			}
-			else {
-				compute_method = ComputeType.GPU_ONLY;
-			}
+			compute_method = config.getGPUDevice() == null ? ComputeType.CPU_ONLY : ComputeType.GPU_ONLY;
 		}
 		
 		if (proxy != null) {

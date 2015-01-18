@@ -75,7 +75,7 @@ public class GPU {
 		devices = new LinkedList<GPUDevice>();
 		
 		for (int num = 0; num < count[0]; num++) {
-			byte name[] = new byte[256];
+			byte[] name = new byte[256];
 			
 			result = cudalib.cuDeviceGetName(name, 256, num);
 			if (result != CUresult.CUDA_SUCCESS) {

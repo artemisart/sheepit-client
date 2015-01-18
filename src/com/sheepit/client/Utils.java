@@ -187,7 +187,7 @@ public class Utils {
 			return;
 		}
 		if (file.isDirectory()) {
-			String files[] = file.list();
+			String[] files = file.list();
 			if (files != null) {
 				if (files.length != 0) {
 					for (String temp : files) {

@@ -56,21 +56,21 @@ public class Linux extends OS {
 			while (scanner.hasNextLine()) {
 				String line = scanner.nextLine();
 				if (line.startsWith("model name")) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						ret.setName(buf[1].trim());
 					}
 				}
 				
 				if (line.startsWith("cpu family")) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						ret.setFamily(buf[1].trim());
 					}
 				}
 				
 				if (line.startsWith("model") && line.startsWith("model name") == false) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						ret.setModel(buf[1].trim());
 					}
@@ -97,7 +97,7 @@ public class Linux extends OS {
 				String line = scanner.nextLine();
 				
 				if (line.startsWith("MemTotal")) {
-					String buf[] = line.split(":");
+					String[] buf = line.split(":");
 					if (buf.length > 0) {
 						Integer buf2 = new Integer(buf[1].trim().split(" ")[0]);
 						return (((buf2 / 262144) + 1) * 262144); // 256*1024 = 262144

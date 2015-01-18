@@ -506,7 +506,7 @@ public class Client {
 			core_script += "import bpy\n" + "bpy.context.user_preferences.system.compute_device_type = \"NONE\"" + "\n" + "bpy.context.scene.cycles.device = \"CPU\"" + "\n" + "bpy.context.scene.render.tile_x = 32" + "\n" + "bpy.context.scene.render.tile_y = 32" + "\n";
 		}
 		File script_file = null;
-		String command1[] = ajob.getRenderCommand().split(" ");
+		String[] command1 = ajob.getRenderCommand().split(" ");
 		int size_command = command1.length + 2; // + 2 for script
 		
 		if (this.config.getNbCores() > 0) { // user has specified something

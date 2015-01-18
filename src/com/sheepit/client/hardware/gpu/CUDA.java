@@ -27,10 +27,10 @@ public interface CUDA extends Library {
 	/*
 	 * @return: CUDA_SUCCESS, CUDA_ERROR_DEINITIALIZED, CUDA_ERROR_NOT_INITIALIZED, CUDA_ERROR_INVALID_CONTEXT, CUDA_ERROR_INVALID_VALUE 
 	*/
-	public int cuDeviceGetCount(int count[]);
+	public int cuDeviceGetCount(int[] count);
 	
 	public int cuDeviceGetName(byte[] name, int len, int dev);
 	
 	// http://en.wikipedia.org/wiki/Java_Native_Access
-	public int cuDeviceTotalMem(long bytes[], int dev);
+	public int cuDeviceTotalMem(long[] bytes, int dev);
 }

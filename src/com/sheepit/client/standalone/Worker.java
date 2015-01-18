@@ -146,7 +146,7 @@ public class Worker {
 			SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 			for (String interval : intervals) {
 				String[] times = interval.split("-");
-				if (times != null && times.length == 2) {
+				if (times.length == 2) {
 					Calendar start = Calendar.getInstance();
 					Calendar end = Calendar.getInstance();
 

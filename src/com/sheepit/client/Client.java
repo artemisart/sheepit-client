@@ -608,7 +608,7 @@ public class Client {
 		ajob.setRenderDuration((int) ((rending_end - rending_start) / 1000 + 1)); // render time is in seconds but the getTime is in milliseconds
 		
 		ajob.setMaxOutputNbLines(nb_lines);
-		int exit_value = 0;
+		int exit_value;
 		try {
 			exit_value = ajob.getProcess().exitValue();
 		}

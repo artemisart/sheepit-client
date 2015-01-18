@@ -151,7 +151,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			
 			if (r == HttpURLConnection.HTTP_OK && contentType.startsWith("text/xml")) {
 				DataInputStream in = new DataInputStream(connection.getInputStream());
-				Document document = null;
+				Document document;
 				
 				try {
 					document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
@@ -249,7 +249,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			
 			if (r == HttpURLConnection.HTTP_OK && contentType.startsWith("text/xml")) {
 				DataInputStream in = new DataInputStream(connection.getInputStream());
-				Document document = null;
+				Document document;
 				try {
 					document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 				}
@@ -439,7 +439,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			out.close();
 		}
 		
-		String headerName = null;
+		String headerName;
 		for (int i = 1; (headerName = connection.getHeaderFieldKey(i)) != null; i++) {
 			if (headerName.equals("Set-Cookie")) {
 				String cookie = connection.getHeaderField(i);
@@ -501,7 +501,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 	public ServerCode HTTPSendFile(String surl, String file1) {
 		this.log.debug("Server::HTTPSendFile(" + surl + "," + file1 + ")");
 		
-		HttpURLConnection conn = null;
+		HttpURLConnection conn;
 		
 		File fFile2Snd = new File(file1);
 		
@@ -611,7 +611,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				e1.printStackTrace();
 				return ServerCode.UNKNOWN;
 			}
-			Document document = null;
+			Document document;
 			try {
 				document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
 			}
@@ -672,7 +672,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			
 			byte[] ret = new byte[size];
 			byte[] ch = new byte[512 * 1024];
-			int n = 0;
+			int n;
 			int i = 0;
 			while ((n = inStrm.read(ch)) != -1) {
 				System.arraycopy(ch, 0, ret, i, n);

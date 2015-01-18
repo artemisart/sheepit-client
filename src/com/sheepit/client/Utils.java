@@ -112,7 +112,7 @@ public class Utils {
 			return "";
 		}
 		try {
-			int read = 0;
+			int read;
 			byte[] buffer = new byte[8192];
 			while ((read = is.read(buffer)) > 0) {
 				digest.update(buffer, 0, read);

@@ -35,7 +35,7 @@ public class GPU {
 			System.out.println("GPU.listDevices failed to get CUDA lib");
 			return false;
 		}
-		CUDA cudalib = null;
+		CUDA cudalib;
 		try {
 			cudalib = (CUDA) Native.loadLibrary(path, CUDA.class);
 		}

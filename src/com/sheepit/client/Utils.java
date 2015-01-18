@@ -111,9 +111,9 @@ public class Utils {
 			e1.printStackTrace();
 			return "";
 		}
-		byte[] buffer = new byte[8192];
-		int read = 0;
 		try {
+			int read = 0;
+			byte[] buffer = new byte[8192];
 			while ((read = is.read(buffer)) > 0) {
 				digest.update(buffer, 0, read);
 			}

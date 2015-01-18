@@ -36,11 +36,6 @@ public class Working implements Activity {
 	@Override
 	public void show() {
 		int n = 10;
-		int size_height_label = 24;
-		int sep = 45;
-		int start_label_left = 109;
-		int start_label_right = 280;
-		int end_label_right = 490;
 		
 		ImageIcon image = new ImageIcon(getClass().getResource("/title.png"));
 		JLabel labelImage = new JLabel(image);
@@ -51,11 +46,15 @@ public class Working implements Activity {
 		n += 40;
 		
 		JLabel statusLabel = new JLabel("Status:");
+		int start_label_left = 109;
+		int size_height_label = 24;
 		statusLabel.setBounds(start_label_left, n, 240, size_height_label);
 		parent.getContentPane().add(statusLabel);
 		
 		statusContent.setVerticalAlignment(JLabel.TOP);
 		statusContent.setVerticalTextPosition(JLabel.TOP);
+		int start_label_right = 280;
+		int sep = 45;
 		statusContent.setBounds(start_label_right, n, 600 -20 - start_label_right, size_height_label + sep - 3);
 		parent.getContentPane().add(statusContent);
 		
@@ -65,6 +64,7 @@ public class Working implements Activity {
 		renderedFrameLabel.setBounds(start_label_left, n, 240, size_height_label);
 		parent.getContentPane().add(renderedFrameLabel);
 		
+		int end_label_right = 490;
 		renderedFrameContent.setBounds(start_label_right, n, end_label_right - start_label_right, size_height_label);
 		parent.getContentPane().add(renderedFrameContent);
 		

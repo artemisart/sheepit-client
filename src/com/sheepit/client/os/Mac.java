@@ -50,21 +50,20 @@ public class Mac extends OS {
 	public CPU getCPU() {
 		CPU ret = new CPU();
 		
-		String command = "sysctl machdep.cpu.family machdep.cpu.brand_string";
-		
 		Process p = null;
 		BufferedReader input = null;
 		try {
-			String line;
+			String command = "sysctl machdep.cpu.family machdep.cpu.brand_string";
 			p = Runtime.getRuntime().exec(command);
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			
+			String line;
 			while ((line = input.readLine()) != null) {
-				String option_cpu_family = "machdep.cpu.family:";
 				String option_model_name = "machdep.cpu.brand_string:";
 				if (line.startsWith(option_model_name)) {
 					ret.setName(line.substring(option_model_name.length()).trim());
 				}
+				String option_cpu_family = "machdep.cpu.family:";
 				if (line.startsWith(option_cpu_family)) {
 					ret.setFamily(line.substring(option_cpu_family.length()).trim());
 				}
@@ -99,15 +98,15 @@ public class Mac extends OS {
 	
 	@Override
 	public int getMemory() {
-		String command = "sysctl hw.memsize";
 		
 		Process p = null;
 		BufferedReader input = null;
 		try {
-			String line;
+			String command = "sysctl hw.memsize";
 			p = Runtime.getRuntime().exec(command);
 			input = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			
+			String line;
 			while ((line = input.readLine()) != null) {
 				String option = "hw.memsize:";
 				if (line.startsWith(option)) {

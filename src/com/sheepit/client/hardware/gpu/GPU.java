@@ -52,9 +52,7 @@ public class GPU {
 			return false;
 		}
 		
-		int result = CUresult.CUDA_ERROR_UNKNOWN;
-		
-		result = cudalib.cuInit(0);
+		int result = cudalib.cuInit(0);
 		if (result != CUresult.CUDA_SUCCESS) {
 			return false;
 		}

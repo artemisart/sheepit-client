@@ -97,15 +97,13 @@ public class Client {
 			return -4;
 		}
 		
-		int step;
 		try {
-			step = this.log.newCheckPoint();
+			int step = this.log.newCheckPoint();
 			this.gui.status("Starting");
 			
 			this.config.cleanWorkingDirectory();
 			
-			Error.Type ret;
-			ret = this.server.getConfiguration();
+			Type ret = this.server.getConfiguration();
 			
 			if (ret != Error.Type.OK) {
 				this.gui.error(Error.humanString(ret));
@@ -341,14 +339,12 @@ public class Client {
 	
 	public int senderLoop() {
 		int step = log.newCheckPoint();
-		Error.Type ret;
 		while (true) {
-			Job job_to_send;
 			try {
-				job_to_send = (Job) jobsToValidate.take();
+				Job job_to_send = (Job) jobsToValidate.take();
 				this.log.debug("will validate " + job_to_send);
 				//gui.status("Sending frame");
-				ret = confirmJob(job_to_send);
+				Type ret = confirmJob(job_to_send);
 				if (ret == Type.OK) {
 					gui.AddFrameRendered();
 				}
@@ -454,9 +450,8 @@ public class Client {
 	}
 	
 	public Error.Type work(Job ajob) {
-		int ret;
 		
-		ret = this.downloadExecutable(ajob);
+		int ret = this.downloadExecutable(ajob);
 		if (ret != 0) {
 			this.log.error("Client::work problem with downloadExecutable (ret " + ret + ")");
 			return Error.Type.DOWNLOAD_FILE;
@@ -505,7 +500,6 @@ public class Client {
 		else {
 			core_script += "import bpy\n" + "bpy.context.user_preferences.system.compute_device_type = \"NONE\"" + "\n" + "bpy.context.scene.cycles.device = \"CPU\"" + "\n" + "bpy.context.scene.render.tile_x = 32" + "\n" + "bpy.context.scene.render.tile_y = 32" + "\n";
 		}
-		File script_file = null;
 		String[] command1 = ajob.getRenderCommand().split(" ");
 		int size_command = command1.length + 2; // + 2 for script
 		
@@ -520,6 +514,7 @@ public class Client {
 		new_env.put("BLENDER_USER_CONFIG", this.config.workingDirectory.getAbsolutePath().replace("\\", "\\\\"));
  				
 		int index = 0;
+		File script_file = null;
 		for (int i = 0; i < command1.length; i++) {
 			if (command1[i].equals(".c")) {
 				command[index] = ajob.getScenePath();
@@ -530,8 +525,7 @@ public class Client {
 				try {
 					script_file = File.createTempFile("script_", "", this.config.workingDirectory);
 					File file = new File(script_file.getAbsolutePath());
-					FileWriter txt;
-					txt = new FileWriter(file);
+					FileWriter txt = new FileWriter(file);
 					
 					PrintWriter out = new PrintWriter(txt);
 					out.write(ajob.getScript());
@@ -569,15 +563,15 @@ public class Client {
 		
 		int nb_lines = 0;
 		try {
-			String line;
 			this.log.debug(Arrays.toString(command));
 			OS os = OS.getOS();
 			ajob.setProcess(os.exec(command, new_env));
 			BufferedReader input = new BufferedReader(new InputStreamReader(ajob.getProcess().getInputStream()));
 			
-			long last_update_status = 0;
 			this.log.debug("renderer output");
 			try {
+				long last_update_status = 0;
+				String line;
 				while ((line = input.readLine()) != null) {
 					nb_lines++;
 					this.updateRenderingMemoryPeak(line, ajob);
@@ -695,17 +689,14 @@ public class Client {
 		
 		if (renderer_archive_local_path_file.exists() == false) {
 			// we must download the archive
-			int ret;
-			String real_url;
-			real_url = String.format("%s?type=job&job=%s&revision=%s", this.server.getPage("download-archive"), ajob_.getId(), ajob_.getRevision());
-			ret = this.server.HTTPGetFile(real_url, archive_local_path, this.gui, "Downloading scene %s %%");
+			String real_url = String.format("%s?type=job&job=%s&revision=%s", this.server.getPage("download-archive"), ajob_.getId(), ajob_.getRevision());
+			int ret = this.server.HTTPGetFile(real_url, archive_local_path, this.gui, "Downloading scene %s %%");
 			if (ret != 0) {
 				this.gui.error("Client::downloadSceneFile problem with Utils.DownloadFile returned " + ret);
 				return -1;
 			}
 			
-			String md5_local;
-			md5_local = Utils.md5(archive_local_path);
+			String md5_local = Utils.md5(archive_local_path);
 			
 			if (md5_local.equals(ajob_.getSceneMD5()) == false) {
 				System.err.println("md5 of the downloaded file  and the local file are not the same (local '" + md5_local + "' scene: '" + ajob_.getSceneMD5() + "')");
@@ -719,8 +710,7 @@ public class Client {
 	
 	protected int downloadExecutable(Job ajob) {
 		this.gui.status("Downloading renderer");
-		String real_url = new String();
-		real_url = String.format("%s?type=binary&job=%s", this.server.getPage("download-archive"), ajob.getId());
+		String real_url = String.format("%s?type=binary&job=%s", this.server.getPage("download-archive"), ajob.getId());
 		
 		// we have the MD5 of the renderer archive
 		String renderer_archive_local_path = ajob.getRendererArchivePath();
@@ -728,16 +718,14 @@ public class Client {
 		
 		if (renderer_archive_local_path_file.exists() == false) {
 			// we must download the archive
-			int ret;
-			ret = this.server.HTTPGetFile(real_url, renderer_archive_local_path, this.gui, "Downloading renderer %s %%");
+			int ret = this.server.HTTPGetFile(real_url, renderer_archive_local_path, this.gui, "Downloading renderer %s %%");
 			if (ret != 0) {
 				this.gui.error("Client::downloadExecutable problem with Utils.DownloadFile returned " + ret);
 				return -9;
 			}
 		}
 		
-		String md5_local;
-		md5_local = Utils.md5(renderer_archive_local_path);
+		String md5_local = Utils.md5(renderer_archive_local_path);
 		
 		if (md5_local.equals(ajob.getRenderMd5()) == false) {
 			this.log.error("Client::downloadExecutable mismatch on md5  local: '" + md5_local + "' server: '" + ajob.getRenderMd5() + "'");

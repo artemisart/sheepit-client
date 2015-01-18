@@ -226,7 +226,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		return Error.Type.OK;
 	}
 	
-	public Job requestJob() throws FermeException, FermeExceptionNoSession, FermeExceptionSessionDisabled {
+	public Job requestJob() throws FermeException {
 		this.log.debug("Server::requestJob");
 		
 		HttpURLConnection connection = null;

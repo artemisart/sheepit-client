@@ -19,14 +19,13 @@
 
 package com.sheepit.client.standalone;
 
+import com.sheepit.client.Configuration;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.OptionDef;
 import org.kohsuke.args4j.spi.OptionHandler;
 import org.kohsuke.args4j.spi.Parameters;
 import org.kohsuke.args4j.spi.Setter;
-
-import com.sheepit.client.Configuration;
 
 public class VersionParameterHandler<T> extends OptionHandler<T> {
 	public VersionParameterHandler(CmdLineParser parser, OptionDef option, Setter<? super T> setter) {

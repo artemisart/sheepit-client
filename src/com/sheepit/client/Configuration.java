@@ -19,19 +19,15 @@
 
 package com.sheepit.client;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import com.sheepit.client.hardware.cpu.CPU;
+import com.sheepit.client.hardware.gpu.GPUDevice;
+import com.sheepit.client.os.OS;
+
+import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.sheepit.client.hardware.cpu.CPU;
-import com.sheepit.client.hardware.gpu.GPUDevice;
-import com.sheepit.client.os.OS;
 
 public class Configuration {
 	public enum ComputeType {

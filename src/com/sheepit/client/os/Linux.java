@@ -18,15 +18,15 @@
  */
 package com.sheepit.client.os;
 
+import com.sheepit.client.Log;
+import com.sheepit.client.Utils;
+import com.sheepit.client.hardware.cpu.CPU;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-
-import com.sheepit.client.Log;
-import com.sheepit.client.Utils;
-import com.sheepit.client.hardware.cpu.CPU;
 
 public class Linux extends OS {
 	private final String NICE_BINARY_PATH = "nice";

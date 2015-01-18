@@ -19,9 +19,9 @@
 
 package com.sheepit.client;
 
-import java.io.File;
-
 import com.sheepit.client.os.OS;
+
+import java.io.File;
 
 public class Job {
 	private String numFrame;

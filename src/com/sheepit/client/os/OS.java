@@ -18,10 +18,10 @@
  */
 package com.sheepit.client.os;
 
+import com.sheepit.client.hardware.cpu.CPU;
+
 import java.io.IOException;
 import java.util.Map;
-
-import com.sheepit.client.hardware.cpu.CPU;
 
 public abstract class OS {
 	public String name() {

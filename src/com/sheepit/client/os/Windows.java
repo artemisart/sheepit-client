@@ -18,9 +18,6 @@
  */
 package com.sheepit.client.os;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.sheepit.client.hardware.cpu.CPU;
 import com.sheepit.client.os.windows.Kernel32Lib;
 import com.sheepit.client.os.windows.WinProcess;
@@ -29,6 +26,9 @@ import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinBase.MEMORYSTATUSEX;
 import com.sun.jna.platform.win32.WinReg;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class Windows extends OS {
 	

@@ -1,23 +1,17 @@
 package com.sheepit.client.standalone.swing.activity;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 import com.sheepit.client.Configuration;
 import com.sheepit.client.Configuration.ComputeType;
 import com.sheepit.client.hardware.gpu.GPU;
 import com.sheepit.client.hardware.gpu.GPUDevice;
 import com.sheepit.client.standalone.GuiSwing;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Settings implements Activity {
 	private static final String DUMMY_CACHE_DIR = "Auto detected";

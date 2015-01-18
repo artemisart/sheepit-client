@@ -19,20 +19,15 @@
 
 package com.sheepit.client.standalone;
 
-import java.net.URL;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.border.EmptyBorder;
-
 import com.sheepit.client.Client;
 import com.sheepit.client.Configuration;
 import com.sheepit.client.Gui;
 import com.sheepit.client.standalone.swing.activity.Settings;
 import com.sheepit.client.standalone.swing.activity.Working;
+
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import java.net.URL;
 
 public class GuiSwing extends JFrame implements Gui {
 	public enum ActivityType {

@@ -14,9 +14,6 @@
 
 package com.sheepit.client.os.windows;
 
-import java.util.Arrays;
-import java.util.List;
-
 import com.sun.jna.Library;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -25,6 +22,9 @@ import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+
+import java.util.Arrays;
+import java.util.List;
 
 public interface Kernel32Lib extends Library {
 	public static final String path = "kernel32";

@@ -1,20 +1,18 @@
 package com.sheepit.client.standalone.swing.activity;
 
+import com.sheepit.client.Client;
+import com.sheepit.client.Server;
+import com.sheepit.client.standalone.GuiSwing;
+import com.sheepit.client.standalone.GuiSwing.ActivityType;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import com.sheepit.client.Client;
-import com.sheepit.client.Server;
-import com.sheepit.client.standalone.GuiSwing;
-import com.sheepit.client.standalone.GuiSwing.ActivityType;
 
 public class Working implements Activity {
 	GuiSwing parent;

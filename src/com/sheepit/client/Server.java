@@ -19,25 +19,27 @@
 
 package com.sheepit.client;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.NoRouteToHostException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.net.UnknownHostException;
+import com.sheepit.client.Configuration.ComputeType;
+import com.sheepit.client.Error.ServerCode;
+import com.sheepit.client.exception.FermeException;
+import com.sheepit.client.exception.FermeExceptionNoRightToRender;
+import com.sheepit.client.exception.FermeExceptionNoSession;
+import com.sheepit.client.exception.FermeExceptionSessionDisabled;
+import com.sheepit.client.os.OS;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.net.ssl.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.net.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
@@ -46,37 +48,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.sheepit.client.Configuration.ComputeType;
-import com.sheepit.client.Error.ServerCode;
-import com.sheepit.client.exception.FermeException;
-import com.sheepit.client.exception.FermeExceptionNoRightToRender;
-import com.sheepit.client.exception.FermeExceptionNoSession;
-import com.sheepit.client.exception.FermeExceptionSessionDisabled;
-import com.sheepit.client.os.OS;
 
 public class Server extends Thread implements HostnameVerifier, X509TrustManager {
 	private String base_url;

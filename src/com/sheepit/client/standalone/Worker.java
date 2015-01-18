@@ -19,9 +19,13 @@
 
 package com.sheepit.client.standalone;
 
+import com.sheepit.client.*;
+import com.sheepit.client.Configuration.ComputeType;
+import com.sheepit.client.hardware.gpu.GPU;
+import com.sheepit.client.hardware.gpu.GPUDevice;
+import com.sheepit.client.network.ProxyAuthenticator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import static org.kohsuke.args4j.ExampleMode.REQUIRED;
 import org.kohsuke.args4j.Option;
 
 import java.io.File;
@@ -32,16 +36,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedList;
-import com.sheepit.client.Client;
-import com.sheepit.client.Configuration;
-import com.sheepit.client.Configuration.ComputeType;
-import com.sheepit.client.Gui;
-import com.sheepit.client.Log;
-import com.sheepit.client.Pair;
-import com.sheepit.client.ShutdownHook;
-import com.sheepit.client.hardware.gpu.GPU;
-import com.sheepit.client.hardware.gpu.GPUDevice;
-import com.sheepit.client.network.ProxyAuthenticator;
+
+import static org.kohsuke.args4j.ExampleMode.REQUIRED;
 
 public class Worker {
 	@Option(name = "-server", usage = "Render-farm server, default https://www.sheepit-renderfarm.com", metaVar = "URL", required = false)

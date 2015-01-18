@@ -19,11 +19,11 @@
 
 package com.sheepit.client.hardware.gpu;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.sheepit.client.os.OS;
 import com.sun.jna.Native;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class GPU {
 	public static List<GPUDevice> devices = null;

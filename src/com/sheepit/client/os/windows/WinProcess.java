@@ -103,17 +103,11 @@ public class WinProcess {
 	}
 	
 	public boolean kill() {
-		try {
-			List<WinProcess> children = this.getChildren();
-			this.terminate();
-			for (WinProcess child : children) {
-				child.kill();
-			}
+		List<WinProcess> children = this.getChildren();
+		this.terminate();
+		for (WinProcess child : children) {
+			child.kill();
 		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		return false;
 	}
 	

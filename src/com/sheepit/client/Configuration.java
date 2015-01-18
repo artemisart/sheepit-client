@@ -37,7 +37,7 @@ public class Configuration {
 	public File workingDirectory;
 	public File storageDirectory; // for permanent storage (binary archive)
 	public boolean userSpecifiedACacheDir;
-	public String static_exeDirName;
+	public final String static_exeDirName;
 	private String login;
 	private String password;
 	private int maxUploadingJob;

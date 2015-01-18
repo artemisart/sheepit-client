@@ -15,12 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class Working implements Activity {
-	GuiSwing parent;
+	final GuiSwing parent;
 	
-	JLabel statusContent;
-	JLabel renderedFrameContent;
-	JLabel remainingFrameContent;
-	JLabel lastRender;
+	final JLabel statusContent;
+	final JLabel renderedFrameContent;
+	final JLabel remainingFrameContent;
+	final JLabel lastRender;
 	JButton pauseButton;
 	
 	public Working(GuiSwing parent_) {

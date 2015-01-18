@@ -273,9 +273,8 @@ public class Configuration {
 		try {
 			InputStreamReader reader = new InputStreamReader(versionStream);
 			BufferedReader in = new BufferedReader(reader);
-			String version = in.readLine();
 			
-			return version;
+			return in.readLine();
 		}
 		catch (IOException ex) {
 			System.err.println("Configuration::getJarVersion error while reading manifest file (" + versionPath + "): " + ex.getMessage());

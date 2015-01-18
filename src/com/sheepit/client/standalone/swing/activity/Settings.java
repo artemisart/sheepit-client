@@ -150,8 +150,7 @@ public class Settings implements Activity {
 		public void actionPerformed(ActionEvent arg0) {
 			int returnVal = cacheDirChooser.showOpenDialog(parent.getContentPane());
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = cacheDirChooser.getSelectedFile();
-				cacheDir = file;
+				cacheDir = cacheDirChooser.getSelectedFile();
 				cacheDirText.setText(cacheDir.getName());
 			}
 		}

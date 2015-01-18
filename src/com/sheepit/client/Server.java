@@ -526,8 +526,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		DataOutputStream dos = null;
 		BufferedReader inStream = null;
 		
-		String exsistingFileName = file1;
-		File fFile2Snd = new File(exsistingFileName);
+		File fFile2Snd = new File(file1);
 		
 		String lineEnd = "\r\n";
 		String twoHyphens = "--";
@@ -537,11 +536,9 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		byte[] buffer;
 		int maxBufferSize = 1 * 1024 * 1024;
 		
-		String urlString = surl;
-		
 		try {
-			FileInputStream fileInputStream = new FileInputStream(new File(exsistingFileName));
-			URL url = new URL(urlString);
+			FileInputStream fileInputStream = new FileInputStream(new File(file1));
+			URL url = new URL(surl);
 			
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setDoInput(true);
@@ -555,7 +552,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			conn.setRequestProperty("Connection", "Keep-Alive");
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 			
-			if (urlString.startsWith("https://")) {
+			if (surl.startsWith("https://")) {
 				try {
 					SSLContext sc;
 					sc = SSLContext.getInstance("SSL");

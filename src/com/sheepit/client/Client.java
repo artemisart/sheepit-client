@@ -422,7 +422,7 @@ public class Client {
 			for (Pair<Calendar, Calendar> interval : this.config.requestTime) {
 				Calendar start = (Calendar) now.clone();
 				Calendar end = (Calendar) now.clone();
-				start.set(Calendar.SECOND, 00);
+				start.set(Calendar.SECOND, 0);
 				start.set(Calendar.MINUTE, interval.first.get(Calendar.MINUTE));
 				start.set(Calendar.HOUR_OF_DAY, interval.first.get(Calendar.HOUR_OF_DAY));
 				

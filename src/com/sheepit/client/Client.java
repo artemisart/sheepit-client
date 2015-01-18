@@ -268,7 +268,7 @@ public class Client {
 			}
 			
 			// not running but maybe still sending frame
-			while (this.jobsToValidate.size() > 0) {
+			while (!this.jobsToValidate.isEmpty()) {
 				try {
 					Thread.sleep(2300); // wait a little bit
 				}
@@ -388,7 +388,7 @@ public class Client {
 			String args = "";
 			if (job_to_reset_ != null) {
 				args = "?frame=" + job_to_reset_.getFrameNumber() + "&job=" + job_to_reset_.getId() + "&render_time=" + job_to_reset_.getRenderDuration();
-				if (job_to_reset_.getExtras() != null && job_to_reset_.getExtras().length() > 0) {
+				if (job_to_reset_.getExtras() != null && !job_to_reset_.getExtras().isEmpty()) {
 					args += "&extras=" + job_to_reset_.getExtras();
 				}
 			}

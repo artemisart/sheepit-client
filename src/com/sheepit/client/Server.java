@@ -50,12 +50,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Server extends Thread implements HostnameVerifier, X509TrustManager {
-	private String base_url;
-	private Configuration user_config;
-	private Client client;
-	private ArrayList<String> cookies;
-	private HashMap<String, String> pages;
-	private Log log;
+	private final String base_url;
+	private final Configuration user_config;
+	private final Client client;
+	private final ArrayList<String> cookies;
+	private final HashMap<String, String> pages;
+	private final Log log;
 	private long lastRequestTime;
 	private int keepmealive_duration; // time in ms
 	

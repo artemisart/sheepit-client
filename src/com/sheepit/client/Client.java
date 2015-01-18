@@ -40,12 +40,12 @@ public class Client {
 	public static final String UPDATE_METHOD_BY_REMAINING_TIME = "remainingtime";
 	public static final String UPDATE_METHOD_BLENDER_INTERNAL_BY_PART = "blenderinternal";
 	
-	private Gui gui;
+	private final Gui gui;
 	private Server server;
-	private Configuration config;
-	private Log log;
+	private final Configuration config;
+	private final Log log;
 	private Job renderingJob;
-	private BlockingQueue<Job> jobsToValidate;
+	private final BlockingQueue<Job> jobsToValidate;
 	private boolean isValidatingJob;
 	
 	private boolean disableErrorSending;

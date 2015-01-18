@@ -20,7 +20,7 @@
 package com.sheepit.client;
 
 public class ShutdownHook {
-	private Client _client;
+	private final Client _client;
 	
 	public ShutdownHook(Client client_) {
 		this._client = client_;

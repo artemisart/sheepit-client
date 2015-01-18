@@ -26,11 +26,11 @@ import java.util.*;
 public class Log {
 	private static Log instance = null;
 	
-	private Map<Integer, ArrayList<String>> checkpoints = new HashMap<Integer, ArrayList<String>>();;
+	private final Map<Integer, ArrayList<String>> checkpoints = new HashMap<Integer, ArrayList<String>>();;
 	private int lastCheckPoint;
-	private DateFormat dateFormat;
+	private final DateFormat dateFormat;
 	
-	private boolean printStdOut;
+	private final boolean printStdOut;
 	
 	private Log(boolean print_) {
 		this.printStdOut = print_;

@@ -16,7 +16,7 @@ import java.util.List;
 public class Settings implements Activity {
 	private static final String DUMMY_CACHE_DIR = "Auto detected";
 	
-	private GuiSwing parent;
+	private final GuiSwing parent;
 	
 	private JTextField login;
 	private JPasswordField password;
@@ -24,7 +24,7 @@ public class Settings implements Activity {
 	private File cacheDir;
 	private JFileChooser cacheDirChooser;
 	private JCheckBox useCPU;
-	private List<JCheckBox> useGPUs;
+	private final List<JCheckBox> useGPUs;
 	
 	public Settings(GuiSwing parent_) {
 		parent = parent_;

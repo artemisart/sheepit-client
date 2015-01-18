@@ -113,13 +113,7 @@ public class Windows extends OS {
 			Kernel32Lib kernel32lib = (Kernel32Lib) Native.loadLibrary(Kernel32Lib.path, Kernel32Lib.class);
 			kernel32lib.SetErrorMode(Kernel32Lib.SEM_NOGPFAULTERRORBOX);
 		}
-		catch (java.lang.UnsatisfiedLinkError e) {
-			System.out.println("OS.Windows::exec failed to load kernel32lib " + e);
-		}
-		catch (java.lang.ExceptionInInitializerError e) {
-			System.out.println("OS.Windows::exec failed to load kernel32lib " + e);
-		}
-		catch (Exception e) {
+		catch (UnsatisfiedLinkError | ExceptionInInitializerError | Exception e) {
 			System.out.println("OS.Windows::exec failed to load kernel32lib " + e);
 		}
 		

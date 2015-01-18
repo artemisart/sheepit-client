@@ -104,9 +104,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 								}
 							}
 						}
-						catch (SAXException e) {
-						}
-						catch (ParserConfigurationException e) {
+						catch (SAXException | ParserConfigurationException e) {
 						}
 					}
 				}
@@ -116,9 +114,6 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			}
 			try {
 				Thread.sleep(60 * 1000); // 1min
-			}
-			catch (InterruptedException e) {
-				return;
 			}
 			catch (Exception e) {
 				return;
@@ -726,13 +721,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			transformer.transform(new DOMSource(document_cache), new StreamResult(writer));
 			xml_str = writer.getBuffer().toString();
 		}
-		catch (TransformerConfigurationException e) {
-			this.log.debug("Server::generateXMLForMD5cache " + e);
-		}
-		catch (TransformerException e) {
-			this.log.debug("Server::generateXMLForMD5cache " + e);
-		}
-		catch (ParserConfigurationException e) {
+		catch (TransformerException | ParserConfigurationException e) {
 			this.log.debug("Server::generateXMLForMD5cache " + e);
 		}
 		

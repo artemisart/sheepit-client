@@ -143,7 +143,7 @@ public class Linux extends OS {
 		if (this.hasNiceBinary == null) {
 			this.checkNiceAvailability();
 		}
-		if (this.hasNiceBinary.booleanValue()) {
+		if (this.hasNiceBinary) {
 			String[] low = { NICE_BINARY_PATH, "-n", "19" }; // launch the process in lowest priority
 			actual_command = Utils.concatAll(low, command);
 		}

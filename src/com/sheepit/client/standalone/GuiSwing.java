@@ -32,7 +32,7 @@ import java.net.URL;
 public class GuiSwing extends JFrame implements Gui {
 	public enum ActivityType {
 		WORKING, SETTINGS
-	};
+	}
 	
 	private JPanel panel;
 	private Working activityWorking;

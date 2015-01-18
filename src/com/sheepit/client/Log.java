@@ -26,7 +26,7 @@ import java.util.*;
 public class Log {
 	private static Log instance = null;
 	
-	private final Map<Integer, ArrayList<String>> checkpoints = new HashMap<Integer, ArrayList<String>>();;
+	private final Map<Integer, ArrayList<String>> checkpoints = new HashMap<Integer, ArrayList<String>>();
 	private int lastCheckPoint;
 	private final DateFormat dateFormat;
 	

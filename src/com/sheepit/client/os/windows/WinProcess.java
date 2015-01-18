@@ -126,7 +126,7 @@ public class WinProcess {
 		Kernel32.INSTANCE.CloseHandle(this.handle); // we are sure that the parent Process object is dead
 	}
 	
-	private List<WinProcess> getChildren() throws IOException {
+	private List<WinProcess> getChildren() {
 		ArrayList<WinProcess> result = new ArrayList<WinProcess>();
 		
 		WinNT.HANDLE hSnap = this.kernel32lib.CreateToolhelp32Snapshot(Kernel32Lib.TH32CS_SNAPPROCESS, new DWORD(0));

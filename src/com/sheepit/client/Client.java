@@ -396,16 +396,14 @@ public class Client {
 			// no exception should be raised to actual launcher (applet or standalone)
 		}
 		
-		if (error != null && error == Error.Type.RENDERER_CRASHED) {
-			// do nothing, we can ask for a job right away
-		}
-		else {
+		if (error == null || error != Type.RENDERER_CRASHED) {
 			try {
 				Thread.sleep(300000); // sleeping for 5min
 			}
 			catch (InterruptedException e) {
 			}
 		}
+		// else we can ask for a job right away
 	}
 	
 	/**
@@ -745,10 +743,7 @@ public class Client {
 		String renderer_path = ajob.getRendererDirectory();
 		File renderer_path_file = new File(renderer_path);
 		
-		if (renderer_path_file.exists()) {
-			// Directory already exists -> do nothing
-		}
-		else {
+		if (renderer_path_file.exists() == false) {
 			// we create the directory
 			renderer_path_file.mkdir();
 			
@@ -764,10 +759,7 @@ public class Client {
 		String scene_path = ajob.getSceneDirectory();
 		File scene_path_file = new File(scene_path);
 		
-		if (scene_path_file.exists()) {
-			// Directory already exists -> do nothing
-		}
-		else {
+		if (scene_path_file.exists() == false) {
 			// we create the directory
 			scene_path_file.mkdir();
 			

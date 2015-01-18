@@ -341,7 +341,7 @@ public class Client {
 		int step = log.newCheckPoint();
 		while (true) {
 			try {
-				Job job_to_send = (Job) jobsToValidate.take();
+				Job job_to_send = jobsToValidate.take();
 				this.log.debug("will validate " + job_to_send);
 				//gui.status("Sending frame");
 				Type ret = confirmJob(job_to_send);

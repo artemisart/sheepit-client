@@ -516,46 +516,50 @@ public class Client {
 		int index = 0;
 		File script_file = null;
 		for (String aCommand1 : command1) {
-			if (aCommand1.equals(".c")) {
-				command[index] = ajob.getScenePath();
-				index += 1;
-				command[index] = "-P";
-				index += 1;
-				
-				try {
-					script_file = File.createTempFile("script_", "", this.config.workingDirectory);
-					File file = new File(script_file.getAbsolutePath());
-					FileWriter txt = new FileWriter(file);
-					
-					PrintWriter out = new PrintWriter(txt);
-					out.write(ajob.getScript());
-					out.write("\n");
-					out.write(core_script); // GPU part
-					out.write("\n"); // GPU part
-					out.close();
-					
-					command[index] = script_file.getAbsolutePath();
-				}
-				catch (IOException e) {
-					return Error.Type.UNKNOWN;
-				}
-				script_file.deleteOnExit();
-			}
-			else if (aCommand1.equals(".e")) {
-				command[index] = ajob.getRendererPath();
-				// the number of cores has to be put after the binary and before the scene arg
-				if (this.config.getNbCores() > 0) {
+			switch (aCommand1) {
+				case ".c":
+					command[index] = ajob.getScenePath();
 					index += 1;
-					command[index] = "-t";
+					command[index] = "-P";
 					index += 1;
-					command[index] = Integer.toString(this.config.getNbCores());
-					//index += 1; // do not do it, it will be done at the end of the loop 
-				}
+
+					try {
+						script_file = File.createTempFile("script_", "", this.config.workingDirectory);
+						File file = new File(script_file.getAbsolutePath());
+						FileWriter txt = new FileWriter(file);
+
+						PrintWriter out = new PrintWriter(txt);
+						out.write(ajob.getScript());
+						out.write("\n");
+						out.write(core_script); // GPU part
+						out.write("\n"); // GPU part
+						out.close();
+
+						command[index] = script_file.getAbsolutePath();
+					}
+					catch (IOException e) {
+						return Type.UNKNOWN;
+					}
+					script_file.deleteOnExit();
+					break;
+				case ".e":
+					command[index] = ajob.getRendererPath();
+					// the number of cores has to be put after the binary and before the scene arg
+					if (this.config.getNbCores() > 0) {
+						index += 1;
+						command[index] = "-t";
+						index += 1;
+						command[index] = Integer.toString(this.config.getNbCores());
+						//index += 1; // do not do it, it will be done at the end of the loop
+					}
+					break;
+				case ".o":
+					command[index] = this.config.workingDirectory.getAbsolutePath() + File.separator + ajob.getPrefixOutputImage();
+					break;
+				default:
+					command[index] = aCommand1.equals(".f") ? ajob.getFrameNumber() : aCommand1;
+					break;
 			}
-			else if (aCommand1.equals(".o")) {
-				command[index] = this.config.workingDirectory.getAbsolutePath() + File.separator + ajob.getPrefixOutputImage();
-			}
-			else command[index] = aCommand1.equals(".f") ? ajob.getFrameNumber() : aCommand1;
 			index += 1;
 		}
 		

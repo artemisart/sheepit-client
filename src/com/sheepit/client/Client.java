@@ -515,8 +515,8 @@ public class Client {
  				
 		int index = 0;
 		File script_file = null;
-		for (int i = 0; i < command1.length; i++) {
-			if (command1[i].equals(".c")) {
+		for (String aCommand1 : command1) {
+			if (aCommand1.equals(".c")) {
 				command[index] = ajob.getScenePath();
 				index += 1;
 				command[index] = "-P";
@@ -541,7 +541,7 @@ public class Client {
 				}
 				script_file.deleteOnExit();
 			}
-			else if (command1[i].equals(".e")) {
+			else if (aCommand1.equals(".e")) {
 				command[index] = ajob.getRendererPath();
 				// the number of cores has to be put after the binary and before the scene arg
 				if (this.config.getNbCores() > 0) {
@@ -552,10 +552,10 @@ public class Client {
 					//index += 1; // do not do it, it will be done at the end of the loop 
 				}
 			}
-			else if (command1[i].equals(".o")) {
+			else if (aCommand1.equals(".o")) {
 				command[index] = this.config.workingDirectory.getAbsolutePath() + File.separator + ajob.getPrefixOutputImage();
 			}
-			else command[index] = command1[i].equals(".f") ? ajob.getFrameNumber() : command1[i];
+			else command[index] = aCommand1.equals(".f") ? ajob.getFrameNumber() : aCommand1;
 			index += 1;
 		}
 		

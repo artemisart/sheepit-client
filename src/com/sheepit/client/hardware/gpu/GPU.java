@@ -57,11 +57,6 @@ public class GPU {
 			return false;
 		}
 		
-		if (result == CUresult.CUDA_ERROR_NO_DEVICE) {
-			System.out.println("NO DEVICE");
-			return false;
-		}
-		
 		int[] count = new int[1];
 		result = cudalib.cuDeviceGetCount(count);
 		

@@ -205,7 +205,7 @@ public class Settings implements Activity {
 			else if (useCPU.isSelected() == false && selected_gpu != null) {
 				method = ComputeType.GPU_ONLY;
 			}
-			else if (useCPU.isSelected() && selected_gpu != null) {
+			else if (useCPU.isSelected()) {
 				method = ComputeType.CPU_GPU;
 			}
 			config.setComputeMethod(method);

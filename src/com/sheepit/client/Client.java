@@ -855,7 +855,7 @@ public class Client {
 			if (index != -1) {
 				String buf = line.substring(index + search.length());
 				String[] parts = buf.split("-");
-				if (parts != null && parts.length == 2) {
+				if (parts.length == 2) {
 					try {
 						int current = Integer.parseInt(parts[0]); 
 						int total = Integer.parseInt(parts[1]);

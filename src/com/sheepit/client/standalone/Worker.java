@@ -141,32 +141,30 @@ public class Worker {
 		
 		if (request_time != null) {
 			String[] intervals = request_time.split(",");
-			if (intervals != null) {
-				config.requestTime = new LinkedList<>();
-				
-				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-				for (String interval : intervals) {
-					String[] times = interval.split("-");
-					if (times != null && times.length == 2) {
-						Calendar start = Calendar.getInstance();
-						Calendar end = Calendar.getInstance();
-						
-						try {
-							start.setTime(timeFormat.parse(times[0]));
-							end.setTime(timeFormat.parse(times[1]));
-						}
-						catch (ParseException e) {
-							System.err.println("Error: wrong format in request time");
-							System.exit(2);
-						}
-						
-						if (start.before(end)) {
-							config.requestTime.add(new Pair<>(start, end));
-						}
-						else {
-							System.err.println("Error: wrong request time " + times[0] + " is after " + times[1]);
-							System.exit(2);
-						}
+			config.requestTime = new LinkedList<>();
+
+			SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+			for (String interval : intervals) {
+				String[] times = interval.split("-");
+				if (times != null && times.length == 2) {
+					Calendar start = Calendar.getInstance();
+					Calendar end = Calendar.getInstance();
+
+					try {
+						start.setTime(timeFormat.parse(times[0]));
+						end.setTime(timeFormat.parse(times[1]));
+					}
+					catch (ParseException e) {
+						System.err.println("Error: wrong format in request time");
+						System.exit(2);
+					}
+
+					if (start.before(end)) {
+						config.requestTime.add(new Pair<>(start, end));
+					}
+					else {
+						System.err.println("Error: wrong request time " + times[0] + " is after " + times[1]);
+						System.exit(2);
 					}
 				}
 			}

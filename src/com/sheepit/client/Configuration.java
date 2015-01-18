@@ -231,8 +231,8 @@ public class Configuration {
 	}
 	
 	public List<File> getLocalCacheFiles() {
-		List<File> files_local = new LinkedList<File>();
-		List<File> files = new LinkedList<File>();
+		List<File> files_local = new LinkedList<>();
+		List<File> files = new LinkedList<>();
 		if (this.workingDirectory != null) {
 			files.addAll(Arrays.asList(this.workingDirectory.listFiles()));
 		}

@@ -58,7 +58,7 @@ public class Client {
 		this.log = Log.getInstance(this.config);
 		this.gui = gui_;
 		this.renderingJob = null;
-		this.jobsToValidate = new ArrayBlockingQueue<Job>(1024);
+		this.jobsToValidate = new ArrayBlockingQueue<>(1024);
 		this.isValidatingJob = false;
 		
 		this.disableErrorSending = false;
@@ -509,7 +509,7 @@ public class Client {
 		
 		String[] command = new String[size_command];
 		
-		Map<String, String> new_env = new HashMap<String, String>();
+		Map<String, String> new_env = new HashMap<>();
 		
 		new_env.put("BLENDER_USER_CONFIG", this.config.workingDirectory.getAbsolutePath().replace("\\", "\\\\"));
  				

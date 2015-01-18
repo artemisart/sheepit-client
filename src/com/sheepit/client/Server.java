@@ -64,8 +64,8 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		this.base_url = url_;
 		this.user_config = user_config_;
 		this.client = client_;
-		this.pages = new HashMap<String, String>();
-		this.cookies = new ArrayList<String>();
+		this.pages = new HashMap<>();
+		this.cookies = new ArrayList<>();
 		this.log = Log.getInstance(this.user_config);
 		this.lastRequestTime = 0;
 		this.keepmealive_duration = 15 * 60 * 1000; // default 15min

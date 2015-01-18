@@ -96,9 +96,8 @@ public class Log {
 	public static synchronized void printCheckPoint(int point_) {
 		Log log = Log.getInstance(null);
 		ArrayList<String> logs = log.getForCheckPoint(point_);
-		Iterator<String> it = logs.iterator();
-		while (it.hasNext()) {
-			System.out.println(it.next());
+		for (String log1 : logs) {
+			System.out.println(log1);
 		}
 	}
 }

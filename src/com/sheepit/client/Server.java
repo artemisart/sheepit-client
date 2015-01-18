@@ -560,7 +560,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			dos.writeBytes(lineEnd);
 			
 			int bytesAvailable = fileInputStream.available();
-			int maxBufferSize = 1 * 1024 * 1024;
+			int maxBufferSize = 1024 * 1024;
 			int bufferSize = Math.min(bytesAvailable, maxBufferSize);
 			byte[] buffer = new byte[bufferSize];
 			
@@ -705,7 +705,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				rootElement.appendChild(node_file);
 				try {
 					String extension = local_file.getName().substring(local_file.getName().lastIndexOf('.')).toLowerCase();
-					String name = local_file.getName().substring(0, local_file.getName().length() - 1 * extension.length());
+					String name = local_file.getName().substring(0, local_file.getName().length() - extension.length());
 					if (extension.equals(".zip")) {
 						node_file.setAttribute("md5", name);
 					}

@@ -173,10 +173,7 @@ public class Client {
 					// User has no session need to re-authenticate
 					
 					ret = this.server.getConfiguration();
-					if (ret != Error.Type.OK) {
-						this.renderingJob = null;
-					}
-					else {
+					if (ret == Type.OK) {
 						try {
 							Calendar next_request = this.nextJobRequest();
 							if (next_request != null) {
@@ -199,6 +196,9 @@ public class Client {
 						catch (FermeException e1) {
 							this.renderingJob = null;
 						}
+					}
+					else {
+						this.renderingJob = null;
 					}
 				}
 				catch (FermeException e) {
@@ -244,12 +244,12 @@ public class Client {
 				
 				if (this.renderingJob.simultaneousUploadIsAllowed() == false) { // power or compute_method job, need to upload right away
 					ret = confirmJob(this.renderingJob);
-					if (ret != Error.Type.OK) {
-						gui.error("Client::renderingManagement problem with confirmJob (returned " + ret + ")");
-						sendError(step);
+					if (ret == Type.OK) {
+						gui.AddFrameRendered();
 					}
 					else {
-						gui.AddFrameRendered();
+						gui.error("Client::renderingManagement problem with confirmJob (returned " + ret + ")");
+						sendError(step);
 					}
 				}
 				else {
@@ -349,12 +349,12 @@ public class Client {
 				this.log.debug("will validate " + job_to_send);
 				//gui.status("Sending frame");
 				ret = confirmJob(job_to_send);
-				if (ret != Error.Type.OK) {
-					this.gui.error(Error.humanString(ret));
-					sendError(step);
+				if (ret == Type.OK) {
+					gui.AddFrameRendered();
 				}
 				else {
-					gui.AddFrameRendered();
+					this.gui.error(Error.humanString(ret));
+					sendError(step);
 				}
 			}
 			catch (InterruptedException e) {

@@ -208,14 +208,12 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 					return Error.ServerCodeToType(ret);
 				}
 				
-				Element config_node = null;
-				NodeList ns = null;
-				ns = document.getElementsByTagName("config");
+				NodeList ns = document.getElementsByTagName("config");
 				if (ns.getLength() == 0) {
 					this.log.error("getConfiguration error: failed to parse XML, no node 'config'");
 					return Error.Type.WRONG_CONFIGURATION;
 				}
-				config_node = (Element) ns.item(0);
+				Element config_node = (Element) ns.item(0);
 				
 				ns = config_node.getElementsByTagName("request");
 				if (ns.getLength() == 0) {
@@ -264,7 +262,6 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 	
 	public Job requestJob() throws FermeException, FermeExceptionNoRightToRender, FermeExceptionNoSession, FermeExceptionSessionDisabled {
 		this.log.debug("Server::requestJob");
-		String url_contents = "";
 		
 		HttpURLConnection connection = null;
 		try {
@@ -321,14 +318,11 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				
 				handleFileMD5DeleteDocument(document, "jobrequest");
 				
-				Element a_node = null;
-				NodeList ns = null;
-				
-				ns = document.getElementsByTagName("frames");
+				NodeList ns = document.getElementsByTagName("frames");
 				if (ns.getLength() == 0) {
 					throw new FermeException("error requestJob: parseXML failed, no 'frame' node");
 				}
-				a_node = (Element) ns.item(0);
+				Element a_node = (Element) ns.item(0);
 				
 				int remaining_frames = -1;
 				if (a_node.hasAttribute("remaining")) {
@@ -411,6 +405,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				return a_job;
 			}
 			else {
+				String url_contents = "";
 				System.out.println("Server::requestJob url " + url_contents + " r " + r + " contentType " + contentType);
 				InputStream in = connection.getInputStream();
 				String line;
@@ -450,10 +445,9 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 	
 	public HttpURLConnection HTTPRequest(String url_, String data_) throws IOException {
 		this.log.debug("Server::HTTPRequest url(" + url_ + ")");
-		HttpURLConnection connection = null;
 		URL url = new URL(url_);
 		
-		connection = (HttpURLConnection) url.openConnection();
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setDoInput(true);
 		connection.setDoOutput(true);
 		connection.setRequestMethod("GET");
@@ -463,8 +457,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		
 		if (url_.startsWith("https://")) {
 			try {
-				SSLContext sc;
-				sc = SSLContext.getInstance("SSL");
+				SSLContext sc = SSLContext.getInstance("SSL");
 				sc.init(null, new TrustManager[] { this }, null);
 				SSLSocketFactory factory = sc.getSocketFactory();
 				((HttpsURLConnection) connection).setSSLSocketFactory(factory);
@@ -552,26 +545,13 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 	public ServerCode HTTPSendFile(String surl, String file1) {
 		this.log.debug("Server::HTTPSendFile(" + surl + "," + file1 + ")");
 		
-		HttpURLConnection conn = null;
-		DataOutputStream dos = null;
-		BufferedReader inStream = null;
+		HttpURLConnection conn;
 		
-		String exsistingFileName = file1;
-		File fFile2Snd = new File(exsistingFileName);
-		
-		String lineEnd = "\r\n";
-		String twoHyphens = "--";
-		String boundary = "***232404jkg4220957934FW**";
-		
-		int bytesRead, bytesAvailable, bufferSize;
-		byte[] buffer;
-		int maxBufferSize = 1 * 1024 * 1024;
-		
-		String urlString = surl;
+		File fFile2Snd = new File(file1);
 		
 		try {
-			FileInputStream fileInputStream = new FileInputStream(new File(exsistingFileName));
-			URL url = new URL(urlString);
+			FileInputStream fileInputStream = new FileInputStream(new File(file1));
+			URL url = new URL(surl);
 			
 			conn = (HttpURLConnection) url.openConnection();
 			conn.setDoInput(true);
@@ -583,12 +563,12 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 			
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Connection", "Keep-Alive");
+			String boundary = "***232404jkg4220957934FW**";
 			conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
 			
-			if (urlString.startsWith("https://")) {
+			if (surl.startsWith("https://")) {
 				try {
-					SSLContext sc;
-					sc = SSLContext.getInstance("SSL");
+					SSLContext sc = SSLContext.getInstance("SSL");
 					sc.init(null, new TrustManager[] { this }, null);
 					SSLSocketFactory factory = sc.getSocketFactory();
 					((HttpsURLConnection) conn).setSSLSocketFactory(factory);
@@ -616,16 +596,19 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 				}
 			}
 			
-			dos = new DataOutputStream(conn.getOutputStream());
+			DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
+			String twoHyphens = "--";
+			String lineEnd = "\r\n";
 			dos.writeBytes(twoHyphens + boundary + lineEnd);
 			dos.writeBytes("Content-Disposition: form-data; name=\"file\";" + " filename=\"" + fFile2Snd.getName() + "\"" + lineEnd);
 			dos.writeBytes(lineEnd);
 			
-			bytesAvailable = fileInputStream.available();
-			bufferSize = Math.min(bytesAvailable, maxBufferSize);
-			buffer = new byte[bufferSize];
+			int bytesAvailable = fileInputStream.available();
+			int maxBufferSize = 1 * 1024 * 1024;
+			int bufferSize = Math.min(bytesAvailable, maxBufferSize);
+			byte[] buffer = new byte[bufferSize];
 			
-			bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+			int bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 			
 			while (bytesRead > 0) {
 				dos.write(buffer, 0, bufferSize);
@@ -700,7 +683,7 @@ public class Server extends Thread implements HostnameVerifier, X509TrustManager
 		}
 		else {
 			try {
-				inStream = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				BufferedReader inStream = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 				
 				String str;
 				while ((str = inStream.readLine()) != null) {

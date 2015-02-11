@@ -110,9 +110,8 @@ public class Windows extends OS {
 	@Override
 	public Process exec(List<String> command, Map<String, String> env) throws IOException {
 		// disable a popup because the renderer might crash (seg fault)
-		Kernel32Lib kernel32lib = null;
 		try {
-			kernel32lib = (Kernel32Lib) Native.loadLibrary(Kernel32Lib.path, Kernel32Lib.class);
+			Kernel32Lib kernel32lib = (Kernel32Lib) Native.loadLibrary(Kernel32Lib.path, Kernel32Lib.class);
 			kernel32lib.SetErrorMode(Kernel32Lib.SEM_NOGPFAULTERRORBOX);
 		}
 		catch (java.lang.UnsatisfiedLinkError e) {

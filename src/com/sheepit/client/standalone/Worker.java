@@ -104,7 +104,6 @@ public class Worker {
 			return;
 		}
 		
-		ComputeType compute_method = ComputeType.CPU_ONLY;
 		Configuration config = new Configuration(null, login, password);
 		config.setPrintLog(print_log);
 		
@@ -185,6 +184,7 @@ public class Worker {
 			config.setUseNbCores(nb_cores);
 		}
 		
+		ComputeType compute_method = ComputeType.CPU_ONLY;
 		if (method != null) {
 			if (method.equalsIgnoreCase("cpu")) {
 				compute_method = ComputeType.CPU_ONLY;

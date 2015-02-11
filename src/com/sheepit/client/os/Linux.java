@@ -139,21 +139,20 @@ public class Linux extends OS {
 			new_env.put("LD_LIBRARY_PATH", new_env.get("LD_LIBRARY_PATH") + ":" + new_ld_library_path);
 		}
 		
-		List<String> actual_command = command;
 		if (this.hasNiceBinary == null) {
 			this.checkNiceAvailability();
 		}
 		if (this.hasNiceBinary.booleanValue()) {
 			// launch the process in lowest priority
-			actual_command.add(0, "19");
-			actual_command.add(0, "-n");
-			actual_command.add(0, NICE_BINARY_PATH);
+			command.add(0, "19");
+			command.add(0, "-n");
+			command.add(0, NICE_BINARY_PATH);
 		}
 		else {
 			Log.getInstance(null).error("No low priority binary, will not launch renderer in normal priority");
 		}
 		
-		ProcessBuilder builder = new ProcessBuilder(actual_command);
+		ProcessBuilder builder = new ProcessBuilder(command);
 		builder.redirectErrorStream(true);
 		Map<String, String> env = builder.environment();
 		env.putAll(new_env);

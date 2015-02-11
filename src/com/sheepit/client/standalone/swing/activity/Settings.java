@@ -45,12 +45,7 @@ public class Settings implements Activity {
 	public void show() {
 		Configuration config = parent.getConfiguration();
 		
-		int size_height_label = 24;
-		int start_label_left = 109;
-		int start_label_right = 265;
-		int end_label_right = 490;
 		int n = 10;
-		int sep = 45;
 		
 		ImageIcon image = new ImageIcon(getClass().getResource("/title.png"));
 		JLabel labelImage = new JLabel(image);
@@ -61,15 +56,20 @@ public class Settings implements Activity {
 		n += 40;
 		
 		JLabel loginLabel = new JLabel("Login:");
+		int start_label_left = 109;
+		int size_height_label = 24;
 		loginLabel.setBounds(start_label_left, n, 170, size_height_label);
 		parent.getContentPane().add(loginLabel);
 		
 		login = new JTextField();
+		int end_label_right = 490;
+		int start_label_right = 265;
 		login.setBounds(start_label_right, n, end_label_right - start_label_right, size_height_label);
 		login.setText(parent.getConfiguration().login());
 		login.setColumns(20);
 		parent.getContentPane().add(login);
 		
+		int sep = 45;
 		n += sep;
 		
 		JLabel passwordLabel = new JLabel("Password:");
@@ -141,7 +141,7 @@ public class Settings implements Activity {
 				if (gpuChecked) {
 					GPUDevice config_gpu = config.getGPUDevice();
 					if (config_gpu != null && config_gpu.getCudaName().equals(gpu.getCudaName())) {
-						gpuCheckBox.setSelected(gpuChecked);
+						gpuCheckBox.setSelected(true);
 					}
 				}
 				gpuCheckBox.setBounds(start_label_right, n, 200, size_height_label);
@@ -177,8 +177,7 @@ public class Settings implements Activity {
 			JOptionPane.showMessageDialog(parent.getContentPane(), "<html>The working directory has to be dedicated directory. <br />Caution, everything not related to SheepIt-Renderfarm will be removed.<br />You should create a directory specifically for it.</html>", "Warning: files will be removed!", JOptionPane.WARNING_MESSAGE);
 			int returnVal = cacheDirChooser.showOpenDialog(parent.getContentPane());
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File file = cacheDirChooser.getSelectedFile();
-				cacheDir = file;
+				cacheDir = cacheDirChooser.getSelectedFile();
 				cacheDirText.setText(cacheDir.getName());
 			}
 		}

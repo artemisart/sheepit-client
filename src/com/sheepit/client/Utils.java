@@ -127,15 +127,7 @@ public class Utils {
 			}
 			byte[] md5sum = digest.digest();
 			BigInteger bigInt = new BigInteger(1, md5sum);
-			
-			String output = bigInt.toString(16);
-			
-			// fill with "0" because bigInt.toString does not add 0 at the beginning of the result
-			int zero_to_add = 32 - output.length();
-			for (int i = 0; i < zero_to_add; i++)
-				output = "0" + output;
-			
-			return output;
+			return String.format("%32s", bigInt.toString(16));
 		}
 		catch (IOException e) {
 			e.printStackTrace();

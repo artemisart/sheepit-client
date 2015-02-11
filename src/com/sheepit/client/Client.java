@@ -520,16 +520,9 @@ public class Client {
 		int tile_size = this.getTileSize(ajob);
 		core_script += String.format("bpy.context.scene.render.tile_x = %1$d\nbpy.context.scene.render.tile_y = %1$d", tile_size);
 		String command1[] = ajob.getRenderCommand().split(" ");
-		int size_command = command1.length + 2; // + 2 for script
 		
-		if (this.config.getNbCores() > 0) { // user has specified something
-			size_command += 2;
-		}
-		
-		List<String> command = new ArrayList<String>(size_command);
-		
-		Map<String, String> new_env = new HashMap<String, String>();
-		
+		List<String> command = new ArrayList<>();
+		Map<String, String> new_env = new HashMap<>();
 		new_env.put("BLENDER_USER_CONFIG", this.config.workingDirectory.getAbsolutePath().replace("\\", "\\\\"));
 		
 		File script_file = null;

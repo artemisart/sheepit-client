@@ -126,7 +126,7 @@ public class Linux extends OS {
 		// the renderer have a lib directory so add to the LD_LIBRARY_PATH
 		// (even if we are not sure that it is the renderer who is launch
 		
-		Map<String, String> new_env = new HashMap<String, String>();
+		Map<String, String> new_env = new HashMap<>();
 		new_env.putAll(java.lang.System.getenv()); // clone the env
 		Boolean has_ld_library_path = new_env.containsKey("LD_LIBRARY_PATH");
 		

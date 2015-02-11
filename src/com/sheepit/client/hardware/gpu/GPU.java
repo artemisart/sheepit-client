@@ -70,7 +70,7 @@ public class GPU {
 			return false;
 		}
 		
-		devices = new LinkedList<GPUDevice>();
+		devices = new LinkedList<>();
 		
 		for (int num = 0; num < count[0]; num++) {
 			byte name[] = new byte[256];
@@ -102,7 +102,7 @@ public class GPU {
 			return null;
 		}
 		
-		List<String> devs = new LinkedList<String>();
+		List<String> devs = new LinkedList<>();
 		for (GPUDevice dev : devices) {
 			devs.add(dev.getModel());
 		}

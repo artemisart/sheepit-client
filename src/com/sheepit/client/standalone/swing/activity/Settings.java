@@ -38,7 +38,7 @@ public class Settings implements Activity {
 	public Settings(GuiSwing parent_) {
 		parent = parent_;
 		cacheDir = null;
-		useGPUs = new LinkedList<JCheckBoxGPU>();
+		useGPUs = new LinkedList<>();
 	}
 	
 	@Override

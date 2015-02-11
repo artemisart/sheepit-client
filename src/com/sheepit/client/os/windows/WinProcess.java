@@ -127,7 +127,7 @@ public class WinProcess {
 	}
 	
 	private List<WinProcess> getChildren() throws IOException {
-		ArrayList<WinProcess> result = new ArrayList<WinProcess>();
+		ArrayList<WinProcess> result = new ArrayList<>();
 		
 		WinNT.HANDLE hSnap = this.kernel32lib.CreateToolhelp32Snapshot(Kernel32Lib.TH32CS_SNAPPROCESS, new DWORD(0));
 		Kernel32Lib.PROCESSENTRY32.ByReference ent = new Kernel32Lib.PROCESSENTRY32.ByReference();

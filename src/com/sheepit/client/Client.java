@@ -73,7 +73,7 @@ public class Client {
 		this.log = Log.getInstance(this.config);
 		this.gui = gui_;
 		this.renderingJob = null;
-		this.jobsToValidate = new ArrayBlockingQueue<Job>(1024);
+		this.jobsToValidate = new ArrayBlockingQueue<>(1024);
 		this.isValidatingJob = false;
 		
 		this.disableErrorSending = false;

@@ -146,7 +146,7 @@ public class Worker {
 		if (request_time != null) {
 			String[] intervals = request_time.split(",");
 			if (intervals != null) {
-				config.requestTime = new LinkedList<Pair<Calendar, Calendar>>();
+				config.requestTime = new LinkedList<>();
 				
 				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 				for (String interval : intervals) {
@@ -165,7 +165,7 @@ public class Worker {
 						}
 						
 						if (start.before(end)) {
-							config.requestTime.add(new Pair<Calendar, Calendar>(start, end));
+							config.requestTime.add(new Pair<>(start, end));
 						}
 						else {
 							System.err.println("Error: wrong request time " + times[0] + " is after " + times[1]);

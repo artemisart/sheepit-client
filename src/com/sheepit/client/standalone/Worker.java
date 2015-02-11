@@ -233,7 +233,7 @@ public class Worker {
 			}
 			catch (MalformedURLException e) {
 				System.err.println("Error: wrong url for proxy");
-				System.err.println(e);
+				e.printStackTrace();
 				System.exit(2);
 			}
 		}

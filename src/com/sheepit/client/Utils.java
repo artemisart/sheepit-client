@@ -144,23 +144,11 @@ public class Utils {
 		return "";
 	}
 	
-	public static double lastModificationTime(File directory_) {
-		double max = 0.0;
-		if (directory_.isDirectory()) {
-			File[] list = directory_.listFiles();
-			if (list != null) {
-				for (File aFile : list) {
-					double max1 = lastModificationTime(aFile);
-					if (max1 > max) {
-						max = max1;
-					}
-				}
-			}
+	public static double lastModificationTime(File directory) {
+		double max = 0;
+		for (File file : directory.listFiles()) {
+			max = Math.max(max, file.isFile() ? file.lastModified() : lastModificationTime(file));
 		}
-		else if (directory_.isFile()) {
-			return directory_.lastModified();
-		}
-		
 		return max;
 	}
 	

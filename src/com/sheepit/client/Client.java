@@ -617,7 +617,7 @@ public class Client {
 		ajob.setRenderDuration((int) ((rending_end - rending_start) / 1000 + 1)); // render time is in seconds but the getTime is in milliseconds
 		
 		ajob.setMaxOutputNbLines(nb_lines);
-		int exit_value = 0;
+		int exit_value;
 		try {
 			exit_value = ajob.getProcess().exitValue();
 		}
@@ -862,7 +862,7 @@ public class Client {
 			if (index != -1) {
 				String buf = line.substring(index + search.length());
 				String[] parts = buf.split("-");
-				if (parts != null && parts.length == 2) {
+				if (parts.length == 2) {
 					try {
 						int current = Integer.parseInt(parts[0]);
 						int total = Integer.parseInt(parts[1]);

@@ -144,7 +144,7 @@ public class Mac extends OS {
 		if (this.hasNiceBinary == null) {
 			this.checkNiceAvailability();
 		}
-		if (this.hasNiceBinary.booleanValue()) {
+		if (this.hasNiceBinary) {
 			// launch the process in lowest priority
 			command.add(0, "19");
 			command.add(0, "-n");

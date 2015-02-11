@@ -35,7 +35,7 @@ public class GPU {
 			System.out.println("GPU::generate no CUDA lib path found");
 			return false;
 		}
-		CUDA cudalib = null;
+		CUDA cudalib;
 		try {
 			cudalib = (CUDA) Native.loadLibrary(path, CUDA.class);
 		}
@@ -55,10 +55,6 @@ public class GPU {
 		int result = cudalib.cuInit(0);
 		if (result != CUresult.CUDA_SUCCESS) {
 			System.out.println("GPU::generate cuInit failed (ret: " + result + ")");
-			return false;
-		}
-		
-		if (result == CUresult.CUDA_ERROR_NO_DEVICE) {
 			return false;
 		}
 		

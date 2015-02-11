@@ -204,7 +204,7 @@ public class Configuration {
 				else {
 					try {
 						String extension = file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase();
-						String name = file.getName().substring(0, file.getName().length() - 1 * extension.length());
+						String name = file.getName().substring(0, file.getName().length() - extension.length());
 						if (extension.equals(".zip")) {
 							// check if the md5 of the file is ok
 							String md5_local = Utils.md5(file.getAbsolutePath());
@@ -252,7 +252,7 @@ public class Configuration {
 			if (file.isFile()) {
 				try {
 					String extension = file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase();
-					String name = file.getName().substring(0, file.getName().length() - 1 * extension.length());
+					String name = file.getName().substring(0, file.getName().length() - extension.length());
 					if (extension.equals(".zip")) {
 						// check if the md5 of the file is ok
 						String md5_local = Utils.md5(file.getAbsolutePath());

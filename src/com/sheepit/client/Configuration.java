@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
@@ -49,7 +50,7 @@ public class Configuration {
 	private ComputeType computeMethod;
 	private GPUDevice GPUDevice;
 	private boolean printLog;
-	public List<Pair<Calendar, Calendar>> requestTime;
+	public List<Pair<LocalTime, LocalTime>> requestTime;
 	private String extras;
 	
 	public Configuration(File cache_dir_, String login_, String password_) {
@@ -65,7 +66,7 @@ public class Configuration {
 		this.storageDirectory = null;
 		this.setCacheDir(cache_dir_);
 		this.printLog = false;
-		this.requestTime = null;
+		this.requestTime = new LinkedList<>();
 		this.extras = "";
 	}
 	

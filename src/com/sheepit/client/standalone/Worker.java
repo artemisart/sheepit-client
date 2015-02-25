@@ -30,6 +30,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.LinkedList;
 import com.sheepit.client.Client;
@@ -72,7 +74,7 @@ public class Worker {
 	private boolean print_log = false;
 	
 	@Option(name = "-request-time", usage = "H1:M1-H2:M2,H3:M3-H4:M4 Use the 24h format. For example to request job between 2am-8.30am and 5pm-11pm you should do --request-time 2:00-8:30,17:00-23:00 Caution, it's the requesting job time to get a project not the working time", metaVar = "2:00-8:30,17:00-23:00", required = false)
-	private String request_time = null;
+	private String request_time = "";
 	
 	@Option(name = "-proxy", usage = "URL of the proxy", metaVar = "http://login:password@host:port", required = false)
 	private String proxy = null;
@@ -144,36 +146,17 @@ public class Worker {
 			config.setUseGPU(gpu);
 		}
 		
-		if (request_time != null) {
-			String[] intervals = request_time.split(",");
-			if (intervals != null) {
-				config.requestTime = new LinkedList<Pair<Calendar, Calendar>>();
-				
-				SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-				for (String interval : intervals) {
-					String[] times = interval.split("-");
-					if (times != null && times.length == 2) {
-						Calendar start = Calendar.getInstance();
-						Calendar end = Calendar.getInstance();
-						
-						try {
-							start.setTime(timeFormat.parse(times[0]));
-							end.setTime(timeFormat.parse(times[1]));
-						}
-						catch (ParseException e) {
-							System.err.println("Error: wrong format in request time");
-							System.exit(2);
-						}
-						
-						if (start.before(end)) {
-							config.requestTime.add(new Pair<Calendar, Calendar>(start, end));
-						}
-						else {
-							System.err.println("Error: wrong request time " + times[0] + " is after " + times[1]);
-							System.exit(2);
-						}
-					}
-				}
+		for (String interval : request_time.split(",")) {
+			String[] times = interval.split("-");
+			try {
+				LocalTime start = LocalTime.parse(times[0]);
+				LocalTime end = LocalTime.parse(times[1]);
+				config.requestTime.add(new Pair<>(start, end));
+			}
+			catch (DateTimeParseException e) {
+				System.err.println("Error: wrong request time, unable to parse " + e.getParsedString());
+				e.printStackTrace();
+				System.exit(2);
 			}
 		}
 		

@@ -31,6 +31,11 @@ import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalQueries;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -151,21 +156,14 @@ public class Client {
 				}
 				step = this.log.newCheckPoint();
 				try {
-					Calendar next_request = this.nextJobRequest();
-					if (next_request != null) {
-						// wait
-						Date now = new Date();
-						this.gui.status(String.format("Waiting until %tR before requesting job", next_request));
-						try {
-							Thread.sleep(next_request.getTimeInMillis() - now.getTime());
-						}
-						catch (InterruptedException e3) {
-							
-						}
-						catch (IllegalArgumentException e3) {
-							this.log.error("Client::run sleepA failed " + e3);
-						}
+					LocalTime now = LocalTime.now();
+					LocalTime next_request = this.nextJobRequest();
+					long wait = now.until(next_request, ChronoUnit.MILLIS);
+					if (wait < 0) { // it's tomorrow
+						wait += ChronoUnit.DAYS.getDuration().toMillis();
 					}
+					this.gui.status(String.format("Waiting until %tR before requesting job", next_request));
+					Thread.sleep(wait);
 					this.gui.status("Requesting Job");
 					this.renderingJob = this.server.requestJob();
 				}
@@ -193,21 +191,14 @@ public class Client {
 					}
 					else {
 						try {
-							Calendar next_request = this.nextJobRequest();
-							if (next_request != null) {
-								// wait
-								Date now = new Date();
-								this.gui.status(String.format("Waiting until %tR before requesting job", next_request));
-								try {
-									Thread.sleep(next_request.getTimeInMillis() - now.getTime());
-								}
-								catch (InterruptedException e3) {
-									
-								}
-								catch (IllegalArgumentException e3) {
-									this.log.error("Client::run sleepB failed " + e3);
-								}
+							LocalTime now = LocalTime.now();
+							LocalTime next_request = this.nextJobRequest();
+							long wait = now.until(next_request, ChronoUnit.MILLIS);
+							if (wait < 0) { // it's tomorrow
+								wait += ChronoUnit.DAYS.getDuration().toMillis();
 							}
+							this.gui.status(String.format("Waiting until %tR before requesting job", next_request));
+							Thread.sleep(wait);
 							this.gui.status("Requesting Job");
 							this.renderingJob = this.server.requestJob();
 						}
@@ -428,44 +419,26 @@ public class Client {
 	}
 	
 	/**
-	 * 
 	 * @return the date of the next request, or null if there is not delay (null <=> now)
 	 */
-	public Calendar nextJobRequest() {
-		if (this.config.requestTime == null) {
-			return null;
-		}
-		else {
-			Calendar next = null;
-			Calendar now = Calendar.getInstance();
-			for (Pair<Calendar, Calendar> interval : this.config.requestTime) {
-				Calendar start = (Calendar) now.clone();
-				Calendar end = (Calendar) now.clone();
-				start.set(Calendar.SECOND, 00);
-				start.set(Calendar.MINUTE, interval.first.get(Calendar.MINUTE));
-				start.set(Calendar.HOUR_OF_DAY, interval.first.get(Calendar.HOUR_OF_DAY));
-				
-				end.set(Calendar.SECOND, 59);
-				end.set(Calendar.MINUTE, interval.second.get(Calendar.MINUTE));
-				end.set(Calendar.HOUR_OF_DAY, interval.second.get(Calendar.HOUR_OF_DAY));
-				
-				if (start.before(now) && now.before(end)) {
-					return null;
-				}
-				if (start.after(now)) {
-					if (next == null) {
-						next = start;
-					}
-					else {
-						if (start.before(next)) {
-							next = start;
-						}
-					}
-				}
+	public LocalTime nextJobRequest() {
+		LocalTime now = LocalTime.now();
+		LocalTime next = null;
+		for (Pair<LocalTime, LocalTime> interval : this.config.requestTime) {
+			// start < now < end
+			if (interval.first.isBefore(now) && now.isBefore(interval.second)) {
+				return now;
 			}
-			
-			return next;
+			// end < now < start, means that end < start and start is in fact the day after (ex : 23:00-7:00)
+			if (interval.second.isBefore(now) && now.isBefore(interval.first)) {
+				return now;
+			}
+			// if we're not in any range, find the lowest time possible (ie that is > now)
+			if (now.isBefore(interval.first) && (next == null || interval.first.isBefore(next))) {
+				next = interval.first;
+			}
 		}
+		return next;
 	}
 	
 	public Error.Type work(Job ajob) {

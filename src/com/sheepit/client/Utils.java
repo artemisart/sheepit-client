@@ -26,6 +26,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
@@ -102,44 +105,18 @@ public class Utils {
 	}
 	
 	public static String md5(String path_of_file_) {
-		MessageDigest digest;
 		try {
-			digest = MessageDigest.getInstance("MD5");
-		}
-		catch (NoSuchAlgorithmException e1) {
-			e1.printStackTrace();
-			return "";
-		}
-		File f = new File(path_of_file_);
-		InputStream is;
-		try {
-			is = new FileInputStream(f);
-		}
-		catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-			return "";
-		}
-		try {
-			int read;
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			InputStream is = Files.newInputStream(Paths.get(path_of_file_));
+			DigestInputStream dis = new DigestInputStream(is, md);
 			byte[] buffer = new byte[8192];
-			while ((read = is.read(buffer)) > 0) {
-				digest.update(buffer, 0, read);
-			}
-			return String.format("%032x", new BigInteger(1, digest.digest()));
+			while (dis.read(buffer) > 0); // process the entire file
+			return String.format("%032x", new BigInteger(1, md.digest()));
 		}
-		catch (IOException e) {
+		catch (NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();
+			return "";
 		}
-		finally {
-			try {
-				is.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				//throw new RuntimeException("Unable to close input stream for MD5 calculation", e);
-			}
-		}
-		return "";
 	}
 	
 	public static double lastModificationTime(File directory) {

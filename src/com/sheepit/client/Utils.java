@@ -38,6 +38,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.xml.bind.DatatypeConverter;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -111,7 +112,7 @@ public class Utils {
 			DigestInputStream dis = new DigestInputStream(is, md);
 			byte[] buffer = new byte[8192];
 			while (dis.read(buffer) > 0); // process the entire file
-			return String.format("%032x", new BigInteger(1, md.digest()));
+			return DatatypeConverter.printHexBinary(md.digest());
 		}
 		catch (NoSuchAlgorithmException | IOException e) {
 			e.printStackTrace();

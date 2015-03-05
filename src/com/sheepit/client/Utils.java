@@ -125,9 +125,7 @@ public class Utils {
 			while ((read = is.read(buffer)) > 0) {
 				digest.update(buffer, 0, read);
 			}
-			byte[] md5sum = digest.digest();
-			BigInteger bigInt = new BigInteger(1, md5sum);
-			return String.format("%32s", bigInt.toString(16));
+			return String.format("%032x", new BigInteger(1, digest.digest()));
 		}
 		catch (IOException e) {
 			e.printStackTrace();
